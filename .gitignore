@@ -1,0 +1,17 @@
+**/build/
+**/dist/
+**/target/
+**/.settings/
+**/.classpath
+**/.project
+**/.idea/
+**/*.eml
+**/*.iml
+**/*.ipr
+**/*.ids
+**/*.iws
+**/nbproject/
+**/manifest.mf
+**/nbactions.xml
+**/nbbuild.xml
+**/nb-configuration.xml

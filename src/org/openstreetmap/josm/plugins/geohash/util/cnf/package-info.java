@@ -1,0 +1,1 @@
+package org.openstreetmap.josm.plugins.geohash.util.cnf;

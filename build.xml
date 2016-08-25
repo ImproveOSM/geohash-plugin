@@ -7,7 +7,7 @@
 	<property name="plugin.dist.dir" value="${basedir}/dist" />
 	<property name="plugin.lib.dir" value="${basedir}/lib" />
 	<property name="plugin.images.dir" value="${basedir}/images" />
-	<property name="plugin.name" value="OpenStreetView.jar" />
+	<property name="plugin.name" value="geohash.jar" />
 	<property name="JOSM_lib" value="josm-tested.jar" />
 
 	<tstamp>
@@ -37,24 +37,6 @@
 		</javac>
 	</target>
 
-	<!--
-    **********************************************************
-    ** javadoc - creates javadocs
-    **********************************************************
-    -->
-	<target name="javadoc">
-		<mkdir dir="${plugin.apidoc.dir}" />
-		<path id="classpath">
-			<fileset dir="${plugin.lib.dir}" includes="**/*.jar" excludes="josm-tested.jar,josm-latest.jar" />
-			<fileset dir="${plugin.lib.dir}" includes="${JOSM_lib}" />
-		</path>
-		<javadoc destdir="${plugin.apidoc.dir}" source="1.7" classpathref="classpath" windowtitle="OpenStreetView plugin API">
-			<link href="http://java.sun.com/javase/7/docs/api/" />
-			<packageset dir="${plugin.src.dir}">
-			</packageset>
-		</javadoc>
-
-	</target>
 
 	<!--
     **********************************************************
@@ -81,14 +63,11 @@
 			</fileset>
 		</copy>
 		<jar destfile="${plugin.out.dir}/${plugin.name}" basedir="${plugin.build.dir}">
-			<zipfileset src="${plugin.lib.dir}/gson-2.6.2.jar" />
-			<zipfileset src="${plugin.lib.dir}/josm-common-1.1.jar" />
-			<zipfileset src="${plugin.lib.dir}/swingx-all-1.6.5.jar" />
 			<manifest>
 				<attribute name="Author" value="Telenav" />
 				<attribute name="Plugin-Class" value="org.openstreetmap.josm.plugins.geohash.GeohashPlugin" />
 				<attribute name="Plugin-Date" value="${TODAY}" />
-				<attribute name="Plugin-Description" value="Lets you map from OpenStreetView street level imagery." />
+				<attribute name="Plugin-Description" value="Tool for exploring geohashes" />
 				<attribute name="Plugin-Icon" value="images/geohash_logo.png" />
 				<attribute name="Plugin-Version" value="${build-label}" />
 				<attribute name="Plugin-Early" value="true" />

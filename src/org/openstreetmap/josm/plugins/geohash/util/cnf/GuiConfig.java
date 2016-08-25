@@ -1,6 +1,5 @@
 package org.openstreetmap.josm.plugins.geohash.util.cnf;
 
-import com.telenav.josm.common.cnf.BaseConfig;
 
 
 /**

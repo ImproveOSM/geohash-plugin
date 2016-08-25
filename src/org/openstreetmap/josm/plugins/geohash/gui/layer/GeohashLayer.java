@@ -1,6 +1,8 @@
 package org.openstreetmap.josm.plugins.geohash.gui.layer;
 
+import static org.openstreetmap.josm.plugins.geohash.gui.layer.Constants.RENDERING_MAP;
 import java.awt.Graphics2D;
+import java.util.Collection;
 import javax.swing.Action;
 import javax.swing.Icon;
 import org.openstreetmap.josm.data.Bounds;
@@ -9,6 +11,7 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.plugins.geohash.core.Geohash;
 import org.openstreetmap.josm.plugins.geohash.util.cnf.GuiConfig;
 import org.openstreetmap.josm.plugins.geohash.util.cnf.IconConfig;
 
@@ -20,15 +23,37 @@ import org.openstreetmap.josm.plugins.geohash.util.cnf.IconConfig;
  */
 public class GeohashLayer extends Layer {
 
+
+    private Collection<Geohash> geohashes;
+    private final PaintHandler paintHandler;
+
     public GeohashLayer() {
         super(GuiConfig.getInstance().getPluginShortName());
+        this.paintHandler = new PaintHandler();
     }
+
 
     @Override
-    public void paint(final Graphics2D arg0, final MapView arg1, final Bounds arg2) {
-        // TODO add drawing logic
-
+    public void paint(final Graphics2D graphics, final MapView mapView, final Bounds bounds) {
+        mapView.setDoubleBuffered(true);
+        graphics.setRenderingHints(RENDERING_MAP);
+        if (geohashes != null) {
+            // TODO: eliminate duplicate things
+            for (final Geohash geohash : geohashes) {
+                paintHandler.drawGeohash(graphics, mapView, geohash);
+            }
+        }
     }
+
+    public Collection<Geohash> getGeohashes() {
+        return geohashes;
+    }
+
+
+    public void setGeohashes(final Collection<Geohash> geohashes) {
+        this.geohashes = geohashes;
+    }
+
 
     @Override
     public Icon getIcon() {

@@ -18,8 +18,8 @@ package net.exfidefortis.map;
  */
 public class Latitude extends Angle {
 
-    private static final double MINIMUM_DEGREE_VALUE = -90;
-    private static final double MAXIMUM_DEGREE_VALUE = 90;
+    private static final double MINIMUM_DEGREE_VALUE = -85.05112877980659;
+    private static final double MAXIMUM_DEGREE_VALUE = 85.05112877980659;
 
     /** The most southern latitude possible */
     public static final Latitude MINIMUM = new Latitude(MINIMUM_DEGREE_VALUE);
@@ -39,7 +39,7 @@ public class Latitude extends Angle {
      * @throws IllegalArgumentException if the given value is outside the
      * accepted range of [-90.0, 90.0]
      */
-    public static Latitude forDegrees(double degrees) {
+    public static Latitude forDegrees(final double degrees) {
         return new Latitude(degrees);
     }
 
@@ -50,11 +50,11 @@ public class Latitude extends Angle {
      * @throws IllegalArgumentException if the given value is outside the
      * accepted range of [-PI/2, PI/2]
      */
-    public static Latitude forRadians(double radians) {
+    public static Latitude forRadians(final double radians) {
         return new Latitude(Math.toDegrees(radians));
     }
 
-    private Latitude(double degrees) {
+    private Latitude(final double degrees) {
         super(degrees, MINIMUM_DEGREE_VALUE, MAXIMUM_DEGREE_VALUE);
     }
 }

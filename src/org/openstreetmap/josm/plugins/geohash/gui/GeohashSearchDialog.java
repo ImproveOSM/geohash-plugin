@@ -5,10 +5,15 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Optional;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
+import org.openstreetmap.josm.plugins.geohash.core.Geohash;
+import org.openstreetmap.josm.plugins.geohash.util.Converters;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -29,6 +34,7 @@ public class GeohashSearchDialog extends ToggleDialog {
     private final JPanel searchContainer;
     private final JTextField searchInput;
     private final JButton searchButton;
+    private final JLabel searchOutput;
 
 
     public GeohashSearchDialog() {
@@ -47,6 +53,9 @@ public class GeohashSearchDialog extends ToggleDialog {
         searchButton.addActionListener(new SearchAction());
         searchContainer.add(searchButton);
 
+        searchOutput = new JLabel("");
+        searchContainer.add(searchOutput);
+
         add(createLayout(searchContainer, false, null));
     }
 
@@ -54,7 +63,15 @@ public class GeohashSearchDialog extends ToggleDialog {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            System.out.println(searchInput.getText());
+            final Optional<Geohash> searchedGeohash = GeohashLayer.getInstance().getGeohashes().stream()
+                    .filter(g -> g.code().equals(searchInput.getText())).findFirst();
+            if (searchedGeohash.isPresent()) {
+                MainApplication.getMap().mapView
+                .zoomTo(Converters.convertBoundingBoxToBounds(searchedGeohash.get().bounds()));
+                searchOutput.setText("");
+            } else {
+                searchOutput.setText(Configurer.getINSTANCE().getDialogLabelNotFound());
+            }
 
         }
 

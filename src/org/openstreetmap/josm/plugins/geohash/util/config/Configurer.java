@@ -18,6 +18,7 @@ public class Configurer extends BaseConfig {
     private final String dialogShortcutIcon;
     private final String dialogShortcutName;
     private final String dialogButtonName;
+    private final String dialogLabelNotFound;
 
     private Configurer() {
         super(CONFIG_FILE);
@@ -27,6 +28,7 @@ public class Configurer extends BaseConfig {
         dialogShortcutIcon = readProperty("dialog.shortcut.icon");
         dialogShortcutName = readProperty("dialog.shortcut.name");
         dialogButtonName = readProperty("dialog.button.name");
+        dialogLabelNotFound = readProperty("dialog.label.text");
     }
 
 
@@ -62,6 +64,10 @@ public class Configurer extends BaseConfig {
 
     public String getDialogButtonName() {
         return dialogButtonName;
+    }
+
+    public String getDialogLabelNotFound() {
+        return dialogLabelNotFound;
     }
 
 

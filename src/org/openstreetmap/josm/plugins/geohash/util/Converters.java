@@ -1,7 +1,6 @@
 package org.openstreetmap.josm.plugins.geohash.util;
 
 import org.openstreetmap.josm.data.Bounds;
-import org.openstreetmap.josm.data.ProjectionBounds;
 import net.exfidefortis.map.BoundingBox;
 import net.exfidefortis.map.Latitude;
 import net.exfidefortis.map.Longitude;
@@ -21,10 +20,9 @@ public class Converters {
                 .east(Longitude.forDegrees(bounds.getMaxLon())).build();
     }
 
-    public static BoundingBox convertProjectionBoundsToBoundingBox(final ProjectionBounds bounds) {
-        return new BoundingBox.Builder().south(Latitude.forDegrees(bounds.minNorth))
-                .west(Longitude.forDegrees(bounds.minEast)).north(Latitude.forDegrees(bounds.maxNorth))
-                .east(Longitude.forDegrees(bounds.maxEast)).build();
-
+    public static Bounds convertBoundingBoxToBounds(final BoundingBox bounds) {
+        return new Bounds(bounds.south().asDegrees(), bounds.west().asDegrees(), bounds.north().asDegrees(),
+                bounds.east().asDegrees());
     }
+
 }

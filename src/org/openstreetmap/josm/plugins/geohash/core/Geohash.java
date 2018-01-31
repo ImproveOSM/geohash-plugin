@@ -3,6 +3,7 @@ package org.openstreetmap.josm.plugins.geohash.core;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+import org.openstreetmap.josm.data.coor.LatLon;
 import net.exfidefortis.map.BoundingBox;
 import net.exfidefortis.map.Point;
 
@@ -58,7 +59,7 @@ public class Geohash {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -77,5 +78,14 @@ public class Geohash {
     @Override
     public String toString() {
         return code + " (" + bounds() + ')';
+    }
+
+    public boolean containsPoint(final LatLon point) {
+        if (point.lat() <= bounds.north().asDegrees() && point.lat() >= bounds.south().asDegrees()
+                && point.lon() >= bounds.west().asDegrees() && point.lon() <= bounds.east().asDegrees()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

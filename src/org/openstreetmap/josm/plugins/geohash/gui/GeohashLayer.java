@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.util.Collection;
+import java.util.Set;
 import javax.swing.Action;
 import javax.swing.Icon;
 import org.openstreetmap.josm.Main;
@@ -18,7 +19,7 @@ import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.geohash.core.Geohash;
 import org.openstreetmap.josm.plugins.geohash.core.GeohashIdentifier;
-import org.openstreetmap.josm.plugins.geohash.util.Converters;
+import org.openstreetmap.josm.plugins.geohash.util.Convert;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.ImageProvider;
 import com.telenav.josm.common.gui.PaintManager;
@@ -34,18 +35,18 @@ import net.exfidefortis.map.Longitude;
 public class GeohashLayer extends Layer {
 
     private static GeohashLayer INSTANCE;
-    private static final int TRANSLATION_20 = 20;
-    private static final int FONT_SIZE = 25;
+    private static final int TRANSLATION_20 = 40;
+    private static final int FONT_SIZE = 13;
     private static final String FONT_NAME = "Verdana";
-    private final Collection<Geohash> geohashes;
+    private final Set<Geohash> geohashes;
     private final Color LINE_COLOR = new Color(0, 0, 200);
     private final Color TEXT_COLOR = new Color(255, 0, 0);
 
 
-    public GeohashLayer() {
+    private GeohashLayer() {
         super(Configurer.getINSTANCE().getPluginName());
         final Bounds worldBounds = Main.getProjection().getWorldBoundsLatLon();
-        geohashes = new GeohashIdentifier().get(Converters.convertBoundsToBoundingBox(worldBounds));
+        geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
     }
 
     public static GeohashLayer getInstance() {
@@ -53,6 +54,10 @@ public class GeohashLayer extends Layer {
             INSTANCE = new GeohashLayer();
         }
         return INSTANCE;
+    }
+
+    public void destroyInstance() {
+        INSTANCE = null;
     }
 
     @Override
@@ -114,7 +119,7 @@ public class GeohashLayer extends Layer {
 
     @Override
     public Object getInfoComponent() {
-        return "This layer contains the logic to display the world's geohash grid over the provided map.";
+        return Configurer.getINSTANCE().getLayerInfoComponent();
     }
 
     @Override
@@ -126,13 +131,17 @@ public class GeohashLayer extends Layer {
 
     }
 
-    public Collection<Geohash> getGeohashes() {
+    public Set<Geohash> getGeohashes() {
         return geohashes;
+    }
+
+    public void addGeohashes(final Collection<Geohash> newGeohashes) {
+        geohashes.addAll(newGeohashes);
     }
 
     @Override
     public String getToolTipText() {
-        return "Layer displaying geohash grid.";
+        return Configurer.getINSTANCE().getLayerTooltipText();
     }
 
     @Override

@@ -11,7 +11,7 @@ import net.exfidefortis.map.Longitude;
  *
  * @author laurad
  */
-public class Converters {
+public class Convert {
 
 
     public static BoundingBox convertBoundsToBoundingBox(final Bounds bounds) {

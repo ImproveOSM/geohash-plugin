@@ -15,6 +15,8 @@ public class Configurer extends BaseConfig {
     private final String pluginName;
     private final String pluginText;
     private final String layerIcon;
+    private final String layerInfoComponent;
+    private final String layerTooltipText;
     private final String dialogShortcutIcon;
     private final String dialogShortcutName;
     private final String dialogButtonName;
@@ -25,6 +27,8 @@ public class Configurer extends BaseConfig {
         pluginName = readProperty("plugin.name");
         pluginText = readProperty("plugin.txt");
         layerIcon = readProperty("layer.icon");
+        layerInfoComponent = readProperty("layer.info.component");
+        layerTooltipText = readProperty("layer.tooltip.text");
         dialogShortcutIcon = readProperty("dialog.shortcut.icon");
         dialogShortcutName = readProperty("dialog.shortcut.name");
         dialogButtonName = readProperty("dialog.button.name");
@@ -68,6 +72,14 @@ public class Configurer extends BaseConfig {
 
     public String getDialogLabelNotFound() {
         return dialogLabelNotFound;
+    }
+
+    public String getLayerInfoComponent() {
+        return layerInfoComponent;
+    }
+
+    public String getLayerTooltipText() {
+        return layerTooltipText;
     }
 
 

@@ -13,7 +13,7 @@ import javax.swing.JTextField;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.plugins.geohash.core.Geohash;
-import org.openstreetmap.josm.plugins.geohash.util.Converters;
+import org.openstreetmap.josm.plugins.geohash.util.Convert;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.Shortcut;
 
@@ -35,6 +35,7 @@ public class GeohashSearchDialog extends ToggleDialog {
     private final JTextField searchInput;
     private final JButton searchButton;
     private final JLabel searchOutput;
+    private final GeohashLayer layer;
 
 
     public GeohashSearchDialog() {
@@ -42,6 +43,7 @@ public class GeohashSearchDialog extends ToggleDialog {
                 Shortcut.registerShortcut(config.getDialogShortcutName(), config.getDialogShortcutName(), KeyEvent.VK_0,
                         Shortcut.ALT_SHIFT),
                 DLG_HEIGHT, true, null);
+        layer = GeohashLayer.getInstance();
         searchContainer = new JPanel();
         searchContainer.setLayout(new FlowLayout());
         searchContainer.setPreferredSize(DIM);
@@ -63,11 +65,11 @@ public class GeohashSearchDialog extends ToggleDialog {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            final Optional<Geohash> searchedGeohash = GeohashLayer.getInstance().getGeohashes().stream()
-                    .filter(g -> g.code().equals(searchInput.getText())).findFirst();
+            final Optional<Geohash> searchedGeohash =
+                    layer.getGeohashes().stream().filter(g -> g.code().equals(searchInput.getText())).findFirst();
             if (searchedGeohash.isPresent()) {
                 MainApplication.getMap().mapView
-                .zoomTo(Converters.convertBoundingBoxToBounds(searchedGeohash.get().bounds()));
+                .zoomTo(Convert.convertBoundingBoxToBounds(searchedGeohash.get().bounds()));
                 searchOutput.setText("");
             } else {
                 searchOutput.setText(Configurer.getINSTANCE().getDialogLabelNotFound());

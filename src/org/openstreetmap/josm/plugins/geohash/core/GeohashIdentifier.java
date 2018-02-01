@@ -12,12 +12,12 @@ import net.exfidefortis.map.BoundingBox;
  */
 public class GeohashIdentifier {
 
-    private final int cutoffDepth = 10;
+    private final static int cutoffDepth = 10;
 
     /*
      * TODO Refine this simplistic approach once we see that it works.
      */
-    public Collection<Geohash> get(final BoundingBox bounds) {
+    public static Collection<Geohash> get(final BoundingBox bounds) {
         final Collection<Geohash> finalGeohashes = new HashSet<>();
         Geohash currentParent = Geohash.WORLD;
         int depth = 0;

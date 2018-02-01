@@ -28,18 +28,21 @@ import net.exfidefortis.map.Longitude;
 
 
 /**
- *
+ * Contains Geohash plug-in's layer logic.
  *
  * @author laurad
  */
 public class GeohashLayer extends Layer {
 
     private static GeohashLayer INSTANCE;
+    /** Geohash text attributes */
     private static final int TRANSLATION_20 = 40;
     private static final int FONT_SIZE = 13;
     private static final String FONT_NAME = "Verdana";
     private final Set<Geohash> geohashes;
+    /** Geohash rectangle line color */
     private final Color LINE_COLOR = new Color(0, 0, 200);
+    /** Geohash text color */
     private final Color TEXT_COLOR = new Color(255, 0, 0);
 
 
@@ -66,10 +69,11 @@ public class GeohashLayer extends Layer {
         for (final Geohash geohash : geohashes) {
             drawGeohash(graphics, mapView, geohash);
         }
-
     }
 
     /**
+     * Method for drawing a geohash on map. This includes the rectangle (geohash area) and the text (geohash code).
+     *
      * @param graphics
      * @param mapView
      * @param geohash
@@ -84,6 +88,13 @@ public class GeohashLayer extends Layer {
                 TEXT_COLOR);
     }
 
+    /**
+     * Method for calculating geohash rectangle path adapted to map view coordinates.
+     *
+     * @param geohash
+     * @param mapView
+     * @return geohashPath
+     */
     public GeneralPath getGeohashPath(final Geohash geohash, final MapView mapView) {
         final Latitude N = geohash.bounds().north();
         final Longitude W = geohash.bounds().west();
@@ -127,8 +138,7 @@ public class GeohashLayer extends Layer {
         final LayerListDialog layerListDialog = LayerListDialog.getInstance();
         return new Action[] { layerListDialog.createActivateLayerAction(this),
                 layerListDialog.createShowHideLayerAction(), layerListDialog.createDeleteLayerAction(),
-                SeparatorLayerAction.INSTANCE, SeparatorLayerAction.INSTANCE, new LayerListPopup.InfoAction(this) };
-
+                SeparatorLayerAction.INSTANCE, new LayerListPopup.InfoAction(this) };
     }
 
     public Set<Geohash> getGeohashes() {
@@ -137,6 +147,10 @@ public class GeohashLayer extends Layer {
 
     public void addGeohashes(final Collection<Geohash> newGeohashes) {
         geohashes.addAll(newGeohashes);
+    }
+
+    public void removeGeohashes(final Collection<Geohash> removeGeohashes) {
+        geohashes.removeAll(removeGeohashes);
     }
 
     @Override
@@ -152,13 +166,11 @@ public class GeohashLayer extends Layer {
     @Override
     public void mergeFrom(final Layer arg0) {
         // not required
-
     }
 
     @Override
     public void visitBoundingBox(final BoundingXYVisitor arg0) {
         // not required
-
     }
 
 }

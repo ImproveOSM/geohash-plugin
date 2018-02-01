@@ -1,12 +1,11 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Geohash JOSM plug-in documentation.
 
-### What is this repository for? ###
+### About ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* Plug-in to draw a geohash grid over the JOSM map and allow search for a specific geohash. 
+* Version 1.0
 
 ### How do I get set up? ###
 

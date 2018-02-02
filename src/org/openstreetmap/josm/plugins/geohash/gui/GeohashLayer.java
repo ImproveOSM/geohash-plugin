@@ -13,6 +13,7 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.visitor.BoundingXYVisitor;
+import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
@@ -145,12 +146,19 @@ public class GeohashLayer extends Layer {
         return geohashes;
     }
 
+    public void addGeohash(final Geohash geohash) {
+        geohashes.add(geohash);
+        MainApplication.getMap().repaint();
+    }
+
     public void addGeohashes(final Collection<Geohash> newGeohashes) {
         geohashes.addAll(newGeohashes);
+        MainApplication.getMap().repaint();
     }
 
     public void removeGeohashes(final Collection<Geohash> removeGeohashes) {
         geohashes.removeAll(removeGeohashes);
+        MainApplication.getMap().repaint();
     }
 
     @Override

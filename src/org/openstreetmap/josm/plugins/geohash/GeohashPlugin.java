@@ -93,7 +93,6 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
             if (zoomedHash.isPresent()) {
                 final Set<Geohash> newGeohashes = (Set<Geohash>) GeohashIdentifier.get(zoomedHash.get().bounds());
                 layer.addGeohashes(newGeohashes);
-                MainApplication.getMap().repaint();
             }
         }
     }
@@ -185,7 +184,6 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
                             && geohash.code().startsWith(zoomedGeohash.substring(0, zoomedGeohash.length() - 1));
                 }).collect(Collectors.toSet());
                 layer.removeGeohashes(toBeDeleted);
-                MainApplication.getMap().repaint();
             }
         }
     }

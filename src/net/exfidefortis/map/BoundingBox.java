@@ -13,11 +13,14 @@ import java.util.Objects;
 
 
 /**
- * A bounding box defines an area on the map. Its shape depends on the map
- * projection. On a Mercator projection the bounding box is rectangular.
+ * A bounding box defines an area on the map. Its shape depends on the map projection. On a Mercator projection the
+ * bounding box is rectangular.
+ *
  * @author Mihai Chintoanu
  */
 public class BoundingBox {
+
+    private static final double CLOSE_RANGE_1 = 0.3;
 
     public static class Builder {
 
@@ -26,31 +29,31 @@ public class BoundingBox {
         private Longitude east;
         private Longitude west;
 
-        public Builder() { }
+        public Builder() {}
 
-        public Builder(BoundingBox reference) {
+        public Builder(final BoundingBox reference) {
             north = reference.north();
             south = reference.south();
             east = reference.east();
             west = reference.west();
         }
 
-        public Builder north(Latitude north) {
+        public Builder north(final Latitude north) {
             this.north = north;
             return this;
         }
 
-        public Builder south(Latitude south) {
+        public Builder south(final Latitude south) {
             this.south = south;
             return this;
         }
 
-        public Builder east(Longitude east) {
+        public Builder east(final Longitude east) {
             this.east = east;
             return this;
         }
 
-        public Builder west(Longitude west) {
+        public Builder west(final Longitude west) {
             this.west = west;
             return this;
         }
@@ -78,16 +81,15 @@ public class BoundingBox {
 
 
     /** A bounding box which encompasses the whole world */
-    public static final BoundingBox WORLD = new BoundingBox(Latitude.MAXIMUM,
-            Latitude.MINIMUM, Longitude.MAXIMUM, Longitude.MINIMUM);
+    public static final BoundingBox WORLD =
+            new BoundingBox(Latitude.MAXIMUM, Latitude.MINIMUM, Longitude.MAXIMUM, Longitude.MINIMUM);
 
     private final Latitude north;
     private final Latitude south;
     private final Longitude east;
     private final Longitude west;
 
-    private BoundingBox(Latitude north, Latitude south, Longitude east,
-            Longitude west) {
+    private BoundingBox(final Latitude north, final Latitude south, final Longitude east, final Longitude west) {
         if (north.compareTo(south) < 0) {
             throw new IllegalArgumentException("north < south");
         }
@@ -102,46 +104,47 @@ public class BoundingBox {
 
     /**
      * Returns a new bounding box based on this one, but with a different north.
+     *
      * @param north the north boundary for the new bounding box
-     * @return a new bounding box with the given north and all other boundaries
-     * of this bounding box
+     * @return a new bounding box with the given north and all other boundaries of this bounding box
      */
-    public BoundingBox withNorth(Latitude north) {
+    public BoundingBox withNorth(final Latitude north) {
         return new BoundingBox.Builder(this).north(north).build();
     }
 
     /**
      * Returns a new bounding box based on this one, but with a different south.
+     *
      * @param south the south boundary for the new bounding box
-     * @return a new bounding box with the given south and all other boundaries
-     * of this bounding box
+     * @return a new bounding box with the given south and all other boundaries of this bounding box
      */
-    public BoundingBox withSouth(Latitude south) {
+    public BoundingBox withSouth(final Latitude south) {
         return new BoundingBox.Builder(this).south(south).build();
     }
 
     /**
      * Returns a new bounding box based on this one, but with a different east.
+     *
      * @param east the east boundary for the new bounding box
-     * @return a new bounding box with the given east and all other boundaries
-     * of this bounding box
+     * @return a new bounding box with the given east and all other boundaries of this bounding box
      */
-    public BoundingBox withEast(Longitude east) {
+    public BoundingBox withEast(final Longitude east) {
         return new BoundingBox.Builder(this).east(east).build();
     }
 
     /**
      * Returns a new bounding box based on this one, but with a different west.
+     *
      * @param west the west boundary for the new bounding box
-     * @return a new bounding box with the given west and all other boundaries
-     * of this bounding box
+     * @return a new bounding box with the given west and all other boundaries of this bounding box
      */
-    public BoundingBox withWest(Longitude west) {
+    public BoundingBox withWest(final Longitude west) {
         return new BoundingBox.Builder(this).west(west).build();
     }
 
     /**
      * Returns the latitude of the northern edge of this bounding box.
+     *
      * @return this bounding box's north latitude
      */
     public Latitude north() {
@@ -150,6 +153,7 @@ public class BoundingBox {
 
     /**
      * Returns the latitude of the southern edge of this bounding box.
+     *
      * @return this bounding box's south latitude
      */
     public Latitude south() {
@@ -158,6 +162,7 @@ public class BoundingBox {
 
     /**
      * Returns the longitude of the eastern edge of this bounding box.
+     *
      * @return this bounding box's east longitude
      */
     public Longitude east() {
@@ -166,6 +171,7 @@ public class BoundingBox {
 
     /**
      * Returns the longitude of the western edge of this bounding box.
+     *
      * @return this bounding box's west longitude
      */
     public Longitude west() {
@@ -174,6 +180,7 @@ public class BoundingBox {
 
     /**
      * Returns the coordinates of the north western corner of this bounding box.
+     *
      * @return this bounding box's north western coordinate
      */
     public Point northWest() {
@@ -182,6 +189,7 @@ public class BoundingBox {
 
     /**
      * Returns the coordinates of the north eastern corner of this bounding box.
+     *
      * @return this bounding box's north eastern coordinate
      */
     public Point northEast() {
@@ -190,6 +198,7 @@ public class BoundingBox {
 
     /**
      * Returns the coordinates of the south western corner of this bounding box.
+     *
      * @return this bounding box's south western coordinate
      */
     public Point southWest() {
@@ -198,6 +207,7 @@ public class BoundingBox {
 
     /**
      * Returns the coordinates of the south eastern corner of this bounding box.
+     *
      * @return this bounding box's south eastern coordinate
      */
     public Point southEast() {
@@ -205,8 +215,8 @@ public class BoundingBox {
     }
 
     public Point center() {
-        Latitude latitude = Latitude.forDegrees((north.asDegrees() + south.asDegrees()) / 2);
-        Longitude longitude = Longitude.forDegrees((east.asDegrees() + west.asDegrees()) / 2);
+        final Latitude latitude = Latitude.forDegrees((north.asDegrees() + south.asDegrees()) / 2);
+        final Longitude longitude = Longitude.forDegrees((east.asDegrees() + west.asDegrees()) / 2);
         return new Point(longitude, latitude);
     }
 
@@ -214,8 +224,7 @@ public class BoundingBox {
         if (point == null) {
             throw new IllegalArgumentException("received null point");
         }
-        return point.latitude().asDegrees() >= south.asDegrees()
-                && point.latitude().asDegrees() <= north.asDegrees()
+        return point.latitude().asDegrees() >= south.asDegrees() && point.latitude().asDegrees() <= north.asDegrees()
                 && point.longitude().asDegrees() >= west.asDegrees()
                 && point.longitude().asDegrees() <= east.asDegrees();
     }
@@ -240,7 +249,7 @@ public class BoundingBox {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -262,7 +271,7 @@ public class BoundingBox {
 
     @Override
     public String toString() {
-        return "W:" + west.asDegrees() + ", E:" + east.asDegrees()
-                + ", S:" + south.asDegrees() + ", N:" + north.asDegrees();
+        return "W:" + west.asDegrees() + ", E:" + east.asDegrees() + ", S:" + south.asDegrees() + ", N:"
+                + north.asDegrees();
     }
 }

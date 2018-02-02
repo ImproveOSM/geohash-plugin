@@ -79,15 +79,33 @@ public class GeohashSearchDialog extends ToggleDialog {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
+            final String geohashCode = searchInput.getText();
+
             final Optional<Geohash> searchedGeohash =
-                    layer.getGeohashes().stream().filter(g -> g.code().equals(searchInput.getText())).findFirst();
+                    layer.getGeohashes().stream().filter(g -> g.code().equals(geohashCode)).findFirst();
             if (searchedGeohash.isPresent()) {
-                MainApplication.getMap().mapView
-                .zoomTo(Convert.convertBoundingBoxToBounds(searchedGeohash.get().bounds()));
-                searchOutput.setText("");
+                outputSearchFound(searchedGeohash.get());
             } else {
-                searchOutput.setText(Configurer.getINSTANCE().getDialogLabelNotFound());
+                try {
+                    final Geohash findGeohash = new Geohash(geohashCode);
+                    layer.addGeohash(findGeohash);
+                    outputSearchFound(findGeohash);
+                } catch (final IllegalArgumentException ex) {
+                    searchOutput.setText(Configurer.getINSTANCE().getDialogLabelNotFound());
+                }
             }
         }
+
+        /**
+         * Method for displaying the searched geohash on map. Also clears the output message.
+         *
+         * @param searchedGeohash
+         */
+        private void outputSearchFound(final Geohash searchedGeohash) {
+            MainApplication.getMap().mapView.zoomTo(Convert.convertBoundingBoxToBounds(searchedGeohash.bounds()));
+            searchOutput.setText("");
+        }
+
+
     }
 }

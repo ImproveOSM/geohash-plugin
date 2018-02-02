@@ -7,22 +7,16 @@ Geohash JOSM plug-in documentation.
 * Plug-in to draw a geohash grid over the JOSM map and allow search for a specific geohash. 
 * Version 1.0
 
-### How do I get set up? ###
+### Current functionalities ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+* Draws geohash grid over the JOSM map layers. 
+* Using zoom map while pressing shift key will result in calculating a new geohash depth level for the geohash containing the mouse at that moment.
+* Double clicking a geohash will result in removing it and the other equally sized geohashes from it's parent. This does not propagate to inner children of these geohashes.
+* In the Geohash dialog there is a search option that will move the map view on the requested geohash, if input value is valid. 
 
-### Contribution guidelines ###
+### How to set up ###
 
-* Writing tests
-* Code review
-* Other guidelines
+* Check out the project
+* Run ant build: dist and install profiles
+* Open JOSM and add Geohash plugin
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact

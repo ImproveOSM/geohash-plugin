@@ -73,6 +73,7 @@
 				<attribute name="Plugin-Version" value="${build-label}" />
 				<attribute name="Plugin-Early" value="true" />
 				<attribute name="Plugin-Mainversion" value="10161" />
+				<attribute name="Plugin-Canloadatruntime" value="true"/>
 			</manifest>
 		</jar>
 	</target>

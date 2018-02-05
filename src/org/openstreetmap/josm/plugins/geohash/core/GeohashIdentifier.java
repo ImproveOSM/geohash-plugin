@@ -2,6 +2,7 @@ package org.openstreetmap.josm.plugins.geohash.core;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import net.exfidefortis.map.BoundingBox;
 
 
@@ -38,5 +39,29 @@ public class GeohashIdentifier {
             depth++;
         }
         return finalGeohashes;
+    }
+
+    /**
+     * Method called to retrieve the full Geohash hierarchy down to the map view level at loading time.
+     * 
+     * @param parentGoehash
+     * @param mapView
+     * @return
+     */
+    public static Collection<Geohash> getAllInView(BoundingBox parentGoehash, final BoundingBox mapView) {
+        final Collection<Geohash> foundGeohashes = new HashSet<>();
+        while (parentGoehash != null && parentGoehash.contains(mapView)) {
+            final Collection<Geohash> children = get(parentGoehash);
+            final Optional<Geohash> possibleParent =
+                    children.stream().filter(geohash -> geohash.bounds().contains(mapView)).findFirst();
+            if (possibleParent.isPresent()) {
+                parentGoehash = possibleParent.get().bounds();
+            } else {
+                parentGoehash = null;
+            }
+            foundGeohashes.addAll(children);
+
+        }
+        return foundGeohashes;
     }
 }

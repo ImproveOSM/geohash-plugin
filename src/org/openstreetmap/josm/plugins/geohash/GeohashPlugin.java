@@ -87,12 +87,14 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
     public void zoomChanged() {
         if (zoomKeyPressed) {
             final LatLon mouseCoordinates = getMouseCoordinates();
-            final Optional<Geohash> zoomedHash = layer.getGeohashes().stream().filter(geohash -> {
-                return geohash.containsPoint(mouseCoordinates);
-            }).max((g1, g2) -> Integer.compare(g1.code().length(), g2.code().length()));
-            if (zoomedHash.isPresent()) {
-                final Set<Geohash> newGeohashes = (Set<Geohash>) GeohashIdentifier.get(zoomedHash.get().bounds());
-                layer.addGeohashes(newGeohashes);
+            if (mouseCoordinates != null) {
+                final Optional<Geohash> zoomedHash = layer.getGeohashes().stream().filter(geohash -> {
+                    return geohash.containsPoint(mouseCoordinates);
+                }).max((g1, g2) -> Integer.compare(g1.code().length(), g2.code().length()));
+                if (zoomedHash.isPresent()) {
+                    final Set<Geohash> newGeohashes = (Set<Geohash>) GeohashIdentifier.get(zoomedHash.get().bounds());
+                    layer.addGeohashes(newGeohashes);
+                }
             }
         }
     }
@@ -137,9 +139,12 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
      */
     private LatLon getMouseCoordinates() {
         final Point mousePoint = MainApplication.getMainPanel().getMousePosition();
-        final LatLon mouseCoordinates =
-                MainApplication.getMap().mapView.getLatLon(mousePoint.getX(), mousePoint.getY());
-        return mouseCoordinates;
+        if (mousePoint != null) {
+            final LatLon mouseCoordinates =
+                    MainApplication.getMap().mapView.getLatLon(mousePoint.getX(), mousePoint.getY());
+            return mouseCoordinates;
+        }
+        return null;
     }
 
     @Override

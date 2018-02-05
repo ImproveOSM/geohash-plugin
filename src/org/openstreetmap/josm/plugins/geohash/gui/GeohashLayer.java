@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -24,6 +25,7 @@ import org.openstreetmap.josm.plugins.geohash.util.Convert;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.ImageProvider;
 import com.telenav.josm.common.gui.PaintManager;
+import net.exfidefortis.map.BoundingBox;
 import net.exfidefortis.map.Latitude;
 import net.exfidefortis.map.Longitude;
 
@@ -51,6 +53,14 @@ public class GeohashLayer extends Layer {
         super(Configurer.getINSTANCE().getPluginName());
         final Bounds worldBounds = Main.getProjection().getWorldBoundsLatLon();
         geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
+        final BoundingBox mapViewBounds =
+                Convert.convertBoundsToBoundingBox(MainApplication.getMap().mapView.getRealBounds());
+        final Optional<Geohash> geoParent =
+                geohashes.stream().filter(geohash -> geohash.bounds().contains(mapViewBounds)).findFirst();
+        if (geoParent.isPresent()) {
+            geohashes.addAll(GeohashIdentifier.getAllInView(geoParent.get().bounds(), mapViewBounds));
+        }
+
     }
 
     public static GeohashLayer getInstance() {

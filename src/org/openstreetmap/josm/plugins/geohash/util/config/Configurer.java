@@ -1,6 +1,12 @@
 package org.openstreetmap.josm.plugins.geohash.util.config;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.openstreetmap.josm.plugins.geohash.util.Convert;
 import com.telenav.josm.common.cnf.BaseConfig;
+import net.exfidefortis.map.BoundingBox;
+import net.exfidefortis.map.Latitude;
+import net.exfidefortis.map.Longitude;
 
 
 /**
@@ -10,6 +16,8 @@ import com.telenav.josm.common.cnf.BaseConfig;
  */
 public class Configurer extends BaseConfig {
 
+    private static int ZOOM_STEP_LVL_3 = 3;
+    private static int ZOOM_STEP_LVL_2 = 2;
     private static String CONFIG_FILE = "geohash.properties";
     private static Configurer INSTANCE = new Configurer();
     private final String pluginName;
@@ -82,5 +90,42 @@ public class Configurer extends BaseConfig {
         return layerTooltipText;
     }
 
+    /**
+     * Computes a map containing zoom levels as keys and code lengths as values. Only codes with length equal or smaller
+     * will be written for each zoom level. This prevents the drawing of unreadable text.
+     *
+     * @return Map<Integer, Integer>
+     */
+    public Map<Integer, Integer> getCodeVizibilityLevels() {
+        final Map<Integer, Integer> visibilityLevels = new HashMap<>();
+        int codeLength = 1;
+        for (int i = 1; i <= Convert.MAX_ZOOM; i++) {
+            visibilityLevels.put(i, codeLength);
+            if (i <= 15) {
+                if (i % ZOOM_STEP_LVL_3 == 0) {
+                    codeLength++;
+                }
+            } else {
+                if (i % ZOOM_STEP_LVL_2 != 0) {
+                    codeLength++;
+                }
+            }
+        }
+        /** Noticed exceptions in levels */
+        visibilityLevels.replace(15, 6);
+        return visibilityLevels;
+    }
 
+    /**
+     * Returns a bounding box corresponding to the JOSM world map.
+     *
+     * @return BoundingBox
+     */
+    public static BoundingBox getWorldBorder() {
+
+        return new BoundingBox.Builder().south(Latitude.forDegrees(Latitude.MINIMUM_DEGREE_VALUE))
+                .west(Longitude.forDegrees(Longitude.MINIMUM_DEGREE_VALUE))
+                .north(Latitude.forDegrees(Latitude.MAXIMUM_DEGREE_VALUE))
+                .east(Longitude.forDegrees(Longitude.MAXIMUM_DEGREE_VALUE)).build();
+    }
 }

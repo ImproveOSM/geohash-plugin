@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.swing.Action;
@@ -42,23 +43,29 @@ public class GeohashLayer extends Layer {
     private static final int TRANSLATION_20 = 40;
     private static final int FONT_SIZE = 13;
     private static final String FONT_NAME = "Verdana";
-    private final Set<Geohash> geohashes;
+    private Set<Geohash> geohashes;
     /** Geohash rectangle line color */
     private final Color LINE_COLOR = new Color(0, 0, 200);
     /** Geohash text color */
     private final Color TEXT_COLOR = new Color(255, 0, 0);
+    /** Map containing zoom level and code lengths to be shown in order to avoid overlapping */
+    private final Map<Integer, Integer> visibleZoomLevels = Configurer.getINSTANCE().getCodeVizibilityLevels();
 
 
     private GeohashLayer() {
         super(Configurer.getINSTANCE().getPluginName());
         final Bounds worldBounds = Main.getProjection().getWorldBoundsLatLon();
-        geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
-        final BoundingBox mapViewBounds =
-                Convert.convertBoundsToBoundingBox(MainApplication.getMap().mapView.getRealBounds());
-        final Optional<Geohash> geoParent =
-                geohashes.stream().filter(geohash -> geohash.bounds().contains(mapViewBounds)).findFirst();
-        if (geoParent.isPresent()) {
-            geohashes.addAll(GeohashIdentifier.getAllInView(geoParent.get().bounds(), mapViewBounds));
+        try {
+            geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
+            final BoundingBox mapViewBounds =
+                    Convert.convertBoundsToBoundingBox(MainApplication.getMap().mapView.getRealBounds());
+            final Optional<Geohash> geoParent =
+                    geohashes.stream().filter(geohash -> geohash.bounds().contains(mapViewBounds)).findFirst();
+            if (geoParent.isPresent()) {
+                geohashes.addAll(GeohashIdentifier.getAllInView(geoParent.get().bounds(), mapViewBounds));
+            }
+        } catch (final IllegalArgumentException e) {
+            geohashes = (Set<Geohash>) GeohashIdentifier.get(Configurer.getWorldBorder());
         }
 
     }
@@ -93,10 +100,13 @@ public class GeohashLayer extends Layer {
         final GeneralPath path = getGeohashPath(geohash, mapView);
         graphics.setColor(LINE_COLOR);
         graphics.draw(path);
+        final int zoomLevel = Convert.boundsToZoomLevel(mapView.getRealBounds());
+        if (geohash.code().length() <= visibleZoomLevels.get(zoomLevel)) {
+            final Point textPoint = getTextPoint(geohash, mapView);
+            PaintManager.drawText(graphics, geohash.code(), textPoint, new Font(FONT_NAME, Font.BOLD, FONT_SIZE),
+                    TEXT_COLOR);
+        }
 
-        final Point textPoint = getTextPoint(geohash, mapView);
-        PaintManager.drawText(graphics, geohash.code(), textPoint, new Font(FONT_NAME, Font.BOLD, FONT_SIZE),
-                TEXT_COLOR);
     }
 
     /**

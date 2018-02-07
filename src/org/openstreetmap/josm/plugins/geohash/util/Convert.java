@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.plugins.geohash.util;
 
 import org.openstreetmap.josm.data.Bounds;
+import org.openstreetmap.josm.gui.MainApplication;
 import net.exfidefortis.map.BoundingBox;
 import net.exfidefortis.map.Latitude;
 import net.exfidefortis.map.Longitude;
@@ -12,6 +13,12 @@ import net.exfidefortis.map.Longitude;
  * @author laurad
  */
 public class Convert {
+
+    public static final int MIN_ZOOM = 0;
+    public static final int MAX_ZOOM = 25;
+    private static final int TILE_SIZE = 1024;
+    private static final int ZOOM1_SCALE = 78206;
+    private static final int ZOOM_CONST = 2;
 
 
     /**
@@ -37,6 +44,18 @@ public class Convert {
     public static Bounds convertBoundingBoxToBounds(final BoundingBox bounds) {
         return new Bounds(bounds.south().asDegrees(), bounds.west().asDegrees(), bounds.north().asDegrees(),
                 bounds.east().asDegrees());
+    }
+
+    /**
+     * Computes a zoom level based on the given bounds, the closest zoom level being 25. These zoom levels are used to
+     * determine which geohash codes to be displayed and which not.
+     *
+     * @param bounds
+     * @return zoomLevel
+     */
+    public static int boundsToZoomLevel(final Bounds bounds) {
+        return MainApplication.getMap().mapView.getScale() >= ZOOM1_SCALE ? 1 : (int) Math.min(MAX_ZOOM,
+                Math.max(MIN_ZOOM, Math.round(Math.log(TILE_SIZE / bounds.asRect().height) / Math.log(ZOOM_CONST))));
     }
 
 }

@@ -20,8 +20,6 @@ import java.util.Objects;
  */
 public class BoundingBox {
 
-    private static final double CLOSE_RANGE_1 = 0.3;
-
     public static class Builder {
 
         private Latitude north;

@@ -18,8 +18,8 @@ package net.exfidefortis.map;
  */
 public class Longitude extends Angle {
 
-    private static final double MINIMUM_DEGREE_VALUE = -180;
-    private static final double MAXIMUM_DEGREE_VALUE = 180;
+    public static final double MINIMUM_DEGREE_VALUE = -180;
+    public static final double MAXIMUM_DEGREE_VALUE = 180;
 
     /** The most western longitude possible */
     public static final Longitude MINIMUM = new Longitude(MINIMUM_DEGREE_VALUE);
@@ -39,7 +39,7 @@ public class Longitude extends Angle {
      * @throws IllegalArgumentException if the given value is outside the
      * accepted range of [-180.0, 180.0]
      */
-    public static Longitude forDegrees(double degrees) {
+    public static Longitude forDegrees(final double degrees) {
         return new Longitude(degrees);
     }
 
@@ -50,11 +50,11 @@ public class Longitude extends Angle {
      * @throws IllegalArgumentException if the given value is outside the
      * accepted range of [-PI, PI]
      */
-    public static Longitude forRadians(double radians) {
+    public static Longitude forRadians(final double radians) {
         return new Longitude(Math.toDegrees(radians));
     }
 
-    private Longitude(double degrees) {
+    private Longitude(final double degrees) {
         super(degrees, MINIMUM_DEGREE_VALUE, MAXIMUM_DEGREE_VALUE);
     }
 }

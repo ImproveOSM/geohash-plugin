@@ -16,3 +16,4 @@
 **/nbbuild.xml
 **/nb-configuration.xml
 /bin/
+/.gitignore

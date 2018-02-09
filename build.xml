@@ -28,7 +28,7 @@
 
 	<target name="compile" depends="init">
 		<path id="classpath">
-			<fileset dir="${plugin.lib.dir}" includes="**/*.jar" excludes="josm-tested.jar,josm-old.jar" />
+			<fileset dir="${plugin.lib.dir}" includes="**/*.jar" excludes="josm-tested.jar,hamcrest-core-1.3.jar,junit-4.12.jar,gson-2.5.jar" />
 			<fileset dir="${plugin.lib.dir}" includes="${JOSM_lib}" />
 		</path>
 		<javac srcdir="src" debug="true" destdir="${plugin.build.dir}" includeantruntime="true" excludes="**/package-info.java" classpathref="classpath">
@@ -63,6 +63,7 @@
 			</fileset>
 		</copy>
 		<jar destfile="${plugin.out.dir}/${plugin.name}" basedir="${plugin.build.dir}">
+			<zipfileset src="${plugin.lib.dir}/josm-common-3.4.2.jar" />
 			<manifest>
 				<attribute name="Author" value="Telenav" />
 				<attribute name="Plugin-Class" value="org.openstreetmap.josm.plugins.geohash.GeohashPlugin" />
@@ -72,6 +73,7 @@
 				<attribute name="Plugin-Version" value="${build-label}" />
 				<attribute name="Plugin-Early" value="true" />
 				<attribute name="Plugin-Mainversion" value="10161" />
+				<attribute name="Plugin-Canloadatruntime" value="true"/>
 			</manifest>
 		</jar>
 	</target>
@@ -93,6 +95,21 @@
 		<condition property="josm.plugins.dir" value="${env.APPDATA}/JOSM/plugins" else="${user.home}/.josm/plugins">
 			<and>
 				<os family="windows" />
+			</and>
+		</condition>
+		<condition property="josm.plugins.dir" value="${user.home}/Library/JOSM/plugins/">
+			<and>
+				<os family="mac" />
+			</and>
+		</condition>
+		<condition property="josm.plugins.dir" value="${user.home}/.josm/plugins">
+			<and>
+				<not>
+					<os family="mac" />
+				</not>
+				<not>
+					<os family="windows" />
+				</not>
 			</and>
 		</condition>
 		<delete file="${josm.plugins.dir}/${plugin.name}" failonerror="false" />

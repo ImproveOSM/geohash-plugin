@@ -178,17 +178,25 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
     @Override
     public void mouseClicked(final MouseEvent e) {
         if (e.getClickCount() == 2) {
-            final LatLon mouseCoordinates = getMouseCoordinates();
-            final Optional<Geohash> zoomedHash = layer.getGeohashes().stream().filter(geohash -> {
-                return geohash.containsPoint(mouseCoordinates);
-            }).max((g1, g2) -> Integer.compare(g1.code().length(), g2.code().length()));
-            if (zoomedHash.isPresent() && zoomedHash.get().code().length() > 1) {
-                final String zoomedGeohash = zoomedHash.get().code();
-                final Set<Geohash> toBeDeleted = layer.getGeohashes().stream().filter(geohash -> {
-                    return (geohash.code().length() == zoomedGeohash.length())
-                            && geohash.code().startsWith(zoomedGeohash.substring(0, zoomedGeohash.length() - 1));
-                }).collect(Collectors.toSet());
-                layer.removeGeohashes(toBeDeleted);
+            int attempts = 0;
+            LatLon mouseCoordinates = getMouseCoordinates();
+            while (mouseCoordinates == null && attempts < 3) {
+                mouseCoordinates = getMouseCoordinates();
+                attempts++;
+            }
+            if (mouseCoordinates != null) {
+                final LatLon mousePosition = mouseCoordinates;
+                final Optional<Geohash> zoomedHash = layer.getGeohashes().stream().filter(geohash -> {
+                    return geohash.containsPoint(mousePosition);
+                }).max((g1, g2) -> Integer.compare(g1.code().length(), g2.code().length()));
+                if (zoomedHash.isPresent() && zoomedHash.get().code().length() > 1) {
+                    final String zoomedGeohash = zoomedHash.get().code();
+                    final Set<Geohash> toBeDeleted = layer.getGeohashes().stream().filter(geohash -> {
+                        return (geohash.code().length() >= zoomedGeohash.length())
+                                && geohash.code().startsWith(zoomedGeohash.substring(0, zoomedGeohash.length() - 1));
+                    }).collect(Collectors.toSet());
+                    layer.removeGeohashes(toBeDeleted);
+                }
             }
         }
     }

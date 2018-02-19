@@ -1,14 +1,17 @@
 package org.openstreetmap.josm.plugins.geohash.gui;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.geom.GeneralPath;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import org.openstreetmap.josm.Main;
@@ -158,7 +161,8 @@ public class GeohashLayer extends Layer {
     public Action[] getMenuEntries() {
         final LayerListDialog layerListDialog = LayerListDialog.getInstance();
         return new Action[] { layerListDialog.createActivateLayerAction(this),
-                layerListDialog.createShowHideLayerAction(), layerListDialog.createDeleteLayerAction(),
+                layerListDialog.createShowHideLayerAction(), new GeohashLayerDeleteAction(layerListDialog.getModel()),
+                new ClearAction(),
                 SeparatorLayerAction.INSTANCE, new LayerListPopup.InfoAction(this) };
     }
 
@@ -201,4 +205,28 @@ public class GeohashLayer extends Layer {
         // not required
     }
 
+    /**
+     * Layer menu has a clear geohashes option which is implemented by this class. This option removed all existing
+     * children leaving behind just the world geohash.
+     *
+     * @author laurad
+     * @version $Revision$
+     */
+    private class ClearAction extends AbstractAction{
+
+        private static final long serialVersionUID = -7430280025253271160L;
+
+        private ClearAction() {
+            putValue(NAME, tr("Clear geohashes"));
+        }
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            geohashes.clear();
+            final Bounds worldBounds = Main.getProjection().getWorldBoundsLatLon();
+            geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
+            MainApplication.getMap().repaint();
+        }
+
+    }
 }

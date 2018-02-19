@@ -29,6 +29,7 @@ import org.openstreetmap.josm.plugins.geohash.core.Geohash;
 import org.openstreetmap.josm.plugins.geohash.core.GeohashIdentifier;
 import org.openstreetmap.josm.plugins.geohash.gui.GeohashLayer;
 import org.openstreetmap.josm.plugins.geohash.gui.GeohashSearchDialog;
+import org.openstreetmap.josm.plugins.geohash.util.PreferenceManager;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.ImageProvider;
 
@@ -58,14 +59,23 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
     public void mapFrameInitialized(final MapFrame oldMapFrame, final MapFrame newMapFrame) {
         if (MainApplication.getMap() != null && !GraphicsEnvironment.isHeadless()) {
             initializeDialog(newMapFrame);
-            layer = GeohashLayer.getInstance();
-            MainApplication.getLayerManager().addLayer(layer);
-            registerListeners();
+            if (PreferenceManager.getInstance().loadLayerOpenedFlag()) {
+                initializeLayer();
+                registerListeners();
+            }
         }
         if (layerMenu == null) {
             layerMenu = MainMenu.add(MainApplication.getMenu().imageryMenu, new LayerActivator(), false);
             layerMenu.setEnabled(true);
         }
+    }
+
+    /**
+     * Initializes the geohash plug-in layer
+     */
+    private void initializeLayer() {
+        layer = GeohashLayer.getInstance();
+        MainApplication.getLayerManager().addLayer(layer);
     }
 
     /**
@@ -116,6 +126,7 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
         if (MainApplication.getLayerManager().getLayersOfType(TMSLayer.class).size() == 0) {
             layerMenu.setEnabled(false);
         }
+
     }
 
     public void registerListeners() {
@@ -243,6 +254,7 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
                 layer = GeohashLayer.getInstance();
                 MainApplication.getLayerManager().addLayer(layer);
                 registerListeners();
+                PreferenceManager.getInstance().setLayerOpenedFlag(true);
             }
         }
     }

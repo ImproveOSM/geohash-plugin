@@ -161,7 +161,8 @@ public class GeohashLayer extends Layer {
     public Action[] getMenuEntries() {
         final LayerListDialog layerListDialog = LayerListDialog.getInstance();
         return new Action[] { layerListDialog.createActivateLayerAction(this),
-                layerListDialog.createShowHideLayerAction(), layerListDialog.createDeleteLayerAction(), new ClearAction(),
+                layerListDialog.createShowHideLayerAction(), new GeohashLayerDeleteAction(layerListDialog.getModel()),
+                new ClearAction(),
                 SeparatorLayerAction.INSTANCE, new LayerListPopup.InfoAction(this) };
     }
 
@@ -207,7 +208,7 @@ public class GeohashLayer extends Layer {
     /**
      * Layer menu has a clear geohashes option which is implemented by this class. This option removed all existing
      * children leaving behind just the world geohash.
-     * 
+     *
      * @author laurad
      * @version $Revision$
      */

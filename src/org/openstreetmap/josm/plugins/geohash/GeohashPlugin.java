@@ -113,6 +113,7 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
     public void layerAdded(final LayerAddEvent e) {
         if (e.getAddedLayer() instanceof TMSLayer) {
             layerMenu.setEnabled(true);
+            layer.setColors();
         }
     }
 
@@ -122,10 +123,13 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
             layer.destroyInstance();
             unregisterListeners();
             layer = null;
+        } else {
+            layer.setColors();
         }
         if (MainApplication.getLayerManager().getLayersOfType(TMSLayer.class).size() == 0) {
             layerMenu.setEnabled(false);
         }
+
 
     }
 

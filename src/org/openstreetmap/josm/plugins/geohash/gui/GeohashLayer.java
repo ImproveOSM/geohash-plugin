@@ -1,6 +1,7 @@
 package org.openstreetmap.josm.plugins.geohash.gui;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -8,6 +9,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.geom.GeneralPath;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +24,7 @@ import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.dialogs.LayerListDialog;
 import org.openstreetmap.josm.gui.dialogs.LayerListPopup;
+import org.openstreetmap.josm.gui.layer.ImageryLayer;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.geohash.core.Geohash;
 import org.openstreetmap.josm.plugins.geohash.core.GeohashIdentifier;
@@ -41,19 +44,24 @@ import net.exfidefortis.map.Longitude;
  */
 public class GeohashLayer extends Layer {
 
+
     private static GeohashLayer INSTANCE;
-    /** Geohash text attributes */
+    private Set<Geohash> geohashes;
+    /** Map containing zoom level and code lengths to be shown in order to avoid overlapping */
+    private final Map<Integer, Integer> visibleZoomLevels = Configurer.getINSTANCE().getCodeVizibilityLevels();
+    private Color lineColor;
+
+    private static final String BING_AERIAL_IMAGERY = "Bing aerial imagery";
+    private static final String MAPBOX_SATELLITE = "Mapbox Satellite";
+    private static final String DIGITAL_GLOBE_PREMIUM = "DigitalGlobe Premium Imagery";
+    private static final String DIGITAL_GLOBE_STANDARD = "DigitalGlobe Standard Imagery";
+
+    private static final int STROKE_WIDTH_2 = 2;
     private static final int TRANSLATION_20 = 40;
     private static final int FONT_SIZE = 13;
     private static final String FONT_NAME = "Verdana";
-    private Set<Geohash> geohashes;
-    /** Geohash rectangle line color */
-    private final Color LINE_COLOR = new Color(0, 0, 200);
-    /** Geohash text color */
-    private final Color TEXT_COLOR = new Color(255, 0, 0);
-    /** Map containing zoom level and code lengths to be shown in order to avoid overlapping */
-    private final Map<Integer, Integer> visibleZoomLevels = Configurer.getINSTANCE().getCodeVizibilityLevels();
-
+    private final Color LINE_COLOR_LIGHT_BACKGROUND = new Color(0, 0, 255);
+    private final Color LINE_COLOR_DARK_BACKGROUND = new Color(51, 255, 255);
 
     private GeohashLayer() {
         super(Configurer.getINSTANCE().getPluginName());
@@ -70,7 +78,6 @@ public class GeohashLayer extends Layer {
         } catch (final IllegalArgumentException e) {
             geohashes = (Set<Geohash>) GeohashIdentifier.get(Configurer.getWorldBorder());
         }
-
     }
 
     public static GeohashLayer getInstance() {
@@ -87,6 +94,7 @@ public class GeohashLayer extends Layer {
     @Override
     public void paint(final Graphics2D graphics, final MapView mapView, final Bounds bounds) {
         mapView.setDoubleBuffered(true);
+        setColors();
         for (final Geohash geohash : geohashes) {
             drawGeohash(graphics, mapView, geohash);
         }
@@ -101,15 +109,16 @@ public class GeohashLayer extends Layer {
      */
     private void drawGeohash(final Graphics2D graphics, final MapView mapView, final Geohash geohash) {
         final GeneralPath path = getGeohashPath(geohash, mapView);
-        graphics.setColor(LINE_COLOR);
+        graphics.setColor(lineColor);
+        graphics.setStroke(new BasicStroke(STROKE_WIDTH_2));
         graphics.draw(path);
         final int zoomLevel = Convert.boundsToZoomLevel(mapView.getRealBounds());
         if (geohash.code().length() <= visibleZoomLevels.get(zoomLevel)) {
             final Point textPoint = getTextPoint(geohash, mapView);
-            PaintManager.drawText(graphics, geohash.code(), textPoint, new Font(FONT_NAME, Font.BOLD, FONT_SIZE),
-                    TEXT_COLOR);
+            PaintManager.drawText(graphics, geohash.code(), textPoint,
+                    new Font(FONT_NAME, Font.BOLD, FONT_SIZE),
+                    lineColor);
         }
-
     }
 
     /**
@@ -206,6 +215,26 @@ public class GeohashLayer extends Layer {
     }
 
     /**
+     * Method called on layer change to set the line color according to the visible layer background.
+     */
+    public void setColors() {
+        final List<Layer> layers = MainApplication.getLayerManager().getVisibleLayersInZOrder();
+        String layerName = "";
+        for(int i= layers.size()-1; i>=0; i--) {
+            if (layers.get(i) instanceof ImageryLayer) {
+                layerName = ((ImageryLayer) layers.get(i)).getInfo().getName();
+                break;
+            }
+        }
+        if (layerName.equals(BING_AERIAL_IMAGERY) || layerName.equals(MAPBOX_SATELLITE)
+                || layerName.equals(DIGITAL_GLOBE_PREMIUM) || layerName.equals(DIGITAL_GLOBE_STANDARD)) {
+            lineColor = LINE_COLOR_DARK_BACKGROUND;
+        }else {
+            lineColor = LINE_COLOR_LIGHT_BACKGROUND;
+        }
+    }
+
+    /**
      * Layer menu has a clear geohashes option which is implemented by this class. This option removed all existing
      * children leaving behind just the world geohash.
      *
@@ -227,6 +256,5 @@ public class GeohashLayer extends Layer {
             geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
             MainApplication.getMap().repaint();
         }
-
     }
 }

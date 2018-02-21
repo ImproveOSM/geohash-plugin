@@ -212,6 +212,13 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener {
                     }).collect(Collectors.toSet());
                     layer.removeGeohashes(toBeDeleted);
                 }
+                if (zoomedHash.isPresent() && zoomedHash.get().code().length() == 1) {
+                    final String zoomedGeohash = zoomedHash.get().code();
+                    final Set<Geohash> toBeDeleted = this.layer.getGeohashes().stream().filter(geohash -> {
+                        return geohash.code().startsWith(zoomedGeohash.substring(0, zoomedGeohash.length() - 1));
+                    }).collect(Collectors.toSet());
+                    this.layer.removeGeohashes(toBeDeleted);
+                }
             }
         }
     }

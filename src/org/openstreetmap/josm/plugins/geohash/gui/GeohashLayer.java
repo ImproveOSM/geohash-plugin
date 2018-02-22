@@ -51,10 +51,8 @@ public class GeohashLayer extends Layer {
     private final Map<Integer, Integer> visibleZoomLevels = Configurer.getINSTANCE().getCodeVizibilityLevels();
     private Color lineColor;
 
-    private static final String BING_AERIAL_IMAGERY = "Bing aerial imagery";
+    private static final String IMAGERY = "imagery";
     private static final String MAPBOX_SATELLITE = "Mapbox Satellite";
-    private static final String DIGITAL_GLOBE_PREMIUM = "DigitalGlobe Premium Imagery";
-    private static final String DIGITAL_GLOBE_STANDARD = "DigitalGlobe Standard Imagery";
 
     private static final int STROKE_WIDTH_2 = 2;
     private static final int TRANSLATION_20 = 40;
@@ -226,8 +224,7 @@ public class GeohashLayer extends Layer {
                 break;
             }
         }
-        if (layerName.equals(BING_AERIAL_IMAGERY) || layerName.equals(MAPBOX_SATELLITE)
-                || layerName.equals(DIGITAL_GLOBE_PREMIUM) || layerName.equals(DIGITAL_GLOBE_STANDARD)) {
+        if (layerName.toLowerCase().contains(IMAGERY) || layerName.equals(MAPBOX_SATELLITE)) {
             lineColor = LINE_COLOR_DARK_BACKGROUND;
         }else {
             lineColor = LINE_COLOR_LIGHT_BACKGROUND;

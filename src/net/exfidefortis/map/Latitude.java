@@ -18,8 +18,8 @@ package net.exfidefortis.map;
  */
 public class Latitude extends Angle {
 
-    public static final double MINIMUM_DEGREE_VALUE = -85.05112877980659;
-    public static final double MAXIMUM_DEGREE_VALUE = 85.05112877980659;
+    public static final double MINIMUM_DEGREE_VALUE = -90;
+    public static final double MAXIMUM_DEGREE_VALUE = 90;
 
     /** The most southern latitude possible */
     public static final Latitude MINIMUM = new Latitude(MINIMUM_DEGREE_VALUE);

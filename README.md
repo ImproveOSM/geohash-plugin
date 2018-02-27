@@ -20,3 +20,7 @@ Geohash JOSM plug-in documentation.
 * Run ant build: dist and install profiles
 * Open JOSM and add Geohash plugin
 
+### External links ###
+
+* Spaces Documentation: http://spaces.telenav.com:8080/display/TNOSM/GEOHASH+Plug-in+++-+++Product+Documentation
+

@@ -36,7 +36,7 @@ import net.exfidefortis.map.Longitude;
 
 /**
  * Class containing logic used by GeohashLayer to paint the geohash data over the map
- * 
+ *
  * @author laurad
  * @version $Revision$
  */
@@ -101,10 +101,10 @@ public class PaintHandler {
         final Latitude S = geohash.bounds().south();
         final Longitude E = geohash.bounds().east();
 
-        final LatLon NW = new LatLon(N.asDegrees(), W.asDegrees());
-        final LatLon NE = new LatLon(N.asDegrees(), E.asDegrees());
-        final LatLon SW = new LatLon(S.asDegrees(), W.asDegrees());
-        final LatLon SE = new LatLon(S.asDegrees(), E.asDegrees());
+        final LatLon NW = new LatLon(Convert.fitLatitudeInBounds(N.asDegrees()), W.asDegrees());
+        final LatLon NE = new LatLon(Convert.fitLatitudeInBounds(N.asDegrees()), E.asDegrees());
+        final LatLon SW = new LatLon(Convert.fitLatitudeInBounds(S.asDegrees()), W.asDegrees());
+        final LatLon SE = new LatLon(Convert.fitLatitudeInBounds(S.asDegrees()), E.asDegrees());
 
         final GeneralPath path = new GeneralPath();
         path.moveTo(mapView.getPoint(NW).getX(), mapView.getPoint(NW).getY());
@@ -117,7 +117,9 @@ public class PaintHandler {
     }
 
     public Point getTextPoint(final Geohash geohash, final MapView mapView) {
-        final LatLon NW = new LatLon(geohash.bounds().north().asDegrees(), geohash.bounds().west().asDegrees());
+        final double latitude = Convert.fitLatitudeInBounds(geohash.bounds().north().asDegrees());
+        final double longitude = geohash.bounds().west().asDegrees();
+        final LatLon NW = new LatLon(latitude, longitude);
         final Point textPoint = mapView.getPoint(NW);
         textPoint.translate(TRANSLATION_20, TRANSLATION_20);
         return textPoint;

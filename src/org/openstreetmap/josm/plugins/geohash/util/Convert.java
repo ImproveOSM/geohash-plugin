@@ -19,6 +19,8 @@ public class Convert {
     private static final int TILE_SIZE = 1024;
     private static final int ZOOM1_SCALE = 78206;
     private static final int ZOOM_CONST = 2;
+    private static final double JOSM_MAX_LATITUDE = 85.05112877980659;
+    private static final double JOSM_MIN_LATITUDE = -85.05112877980659;
 
 
     /**
@@ -56,5 +58,22 @@ public class Convert {
     public static int boundsToZoomLevel(final Bounds bounds) {
         return MainApplication.getMap().mapView.getScale() >= ZOOM1_SCALE ? 1 : (int) Math.min(MAX_ZOOM,
                 Math.max(MIN_ZOOM, Math.round(Math.log(TILE_SIZE / bounds.asRect().height) / Math.log(ZOOM_CONST))));
+    }
+
+    /**
+     * The JOSM map latitude is between ~85 and ~-85, so everything outside the bounds must be clipped. This method
+     * return a latitude value fitted to JOSM bounds.
+     *
+     * @param latitude
+     * @return
+     */
+    public static double fitLatitudeInBounds(final double latitude) {
+        if (latitude > JOSM_MAX_LATITUDE) {
+            return JOSM_MAX_LATITUDE;
+        }
+        if (latitude < JOSM_MIN_LATITUDE) {
+            return JOSM_MIN_LATITUDE;
+        }
+        return latitude;
     }
 }

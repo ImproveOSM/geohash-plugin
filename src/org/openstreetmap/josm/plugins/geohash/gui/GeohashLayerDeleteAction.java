@@ -47,5 +47,4 @@ public class GeohashLayerDeleteAction extends JosmAction {
         PreferenceManager.getInstance().setLayerOpenedFlag(false);
         deleteAction.actionPerformed(e);
     }
-
 }

@@ -41,6 +41,4 @@ public class PreferenceManager {
     public void setLayerOpenedFlag(final Boolean isOpened) {
         Main.pref.put(LAYER_OPENED, isOpened.toString());
     }
-
-
 }

@@ -47,11 +47,8 @@ public class PaintHandler {
     private static final int FONT_SIZE = 13;
     private static final String FONT_NAME = "Verdana";
 
-    private static final String BING_AERIAL_IMAGERY = "Bing aerial imagery";
+    private static final String IMAGERY = "imagery";
     private static final String MAPBOX_SATELLITE = "Mapbox Satellite";
-    private static final String DIGITAL_GLOBE_PREMIUM = "DigitalGlobe Premium Imagery";
-    private static final String DIGITAL_GLOBE_STANDARD = "DigitalGlobe Standard Imagery";
-
 
     private final Color LINE_COLOR_LIGHT_BACKGROUND = new Color(0, 0, 255);
     private final Color LINE_COLOR_DARK_BACKGROUND = new Color(51, 255, 255);
@@ -137,8 +134,7 @@ public class PaintHandler {
                 break;
             }
         }
-        if (layerName.equals(BING_AERIAL_IMAGERY) || layerName.equals(MAPBOX_SATELLITE)
-                || layerName.equals(DIGITAL_GLOBE_PREMIUM) || layerName.equals(DIGITAL_GLOBE_STANDARD)) {
+        if (layerName.toLowerCase().contains(IMAGERY) || layerName.equals(MAPBOX_SATELLITE)) {
             lineColor = LINE_COLOR_DARK_BACKGROUND;
         } else {
             lineColor = LINE_COLOR_LIGHT_BACKGROUND;

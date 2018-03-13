@@ -40,7 +40,8 @@
 
 	<!--
     **********************************************************
-    ** dist - creates the plugin jar
+    ** dist - creates the plugin j
+    ar
     **********************************************************
     -->
 	<target name="dist" depends="compile">
@@ -92,7 +93,7 @@
     -->
 	<target name="install" depends="dist">
 		<property environment="env" />
-		<condition property="josm.plugins.dir" value="${env.APPDATA}/JOSM/plugins" else="${user.home}/.josm/plugins">
+		<condition property="josm.plugins.dir" value="${env.APPDATA}/JOSM/plugins">
 			<and>
 				<os family="windows" />
 			</and>
@@ -112,7 +113,7 @@
 				</not>
 			</and>
 		</condition>
-		<delete file="${josm.plugins.dir}/${plugin.name}" failonerror="false" />
+		<delete file="${josm.plugins.dir}/${plugin.jar}" failonerror="false" />
 		<copy file="${plugin.dist.dir}/${plugin.name}" todir="${josm.plugins.dir}" />
 	</target>
 </project>

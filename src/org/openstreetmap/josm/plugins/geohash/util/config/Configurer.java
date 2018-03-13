@@ -16,10 +16,11 @@ import net.exfidefortis.map.Longitude;
  */
 public class Configurer extends BaseConfig {
 
-    private static int ZOOM_STEP_LVL_3 = 3;
-    private static int ZOOM_STEP_LVL_2 = 2;
-    private static String CONFIG_FILE = "geohash.properties";
-    private static Configurer INSTANCE = new Configurer();
+    private static final int MAX_VISIBILITY_LVL = 15;
+    private final static int ZOOM_STEP_LVL_3 = 3;
+    private final static int ZOOM_STEP_LVL_2 = 2;
+    private final static String CONFIG_FILE = "geohash.properties";
+    private final static Configurer INSTANCE = new Configurer();
     private final String pluginName;
     private final String pluginText;
     private final String layerIcon;
@@ -101,7 +102,7 @@ public class Configurer extends BaseConfig {
         int codeLength = 1;
         for (int i = 1; i <= Convert.MAX_ZOOM; i++) {
             visibilityLevels.put(i, codeLength);
-            if (i <= 15) {
+            if (i <= MAX_VISIBILITY_LVL) {
                 if (i % ZOOM_STEP_LVL_3 == 0) {
                     codeLength++;
                 }

@@ -37,7 +37,7 @@ class BitArray implements Iterable<Boolean> {
 
     public boolean get(final int index) {
         if (index < 0 || index >= bits.size()) {
-            throw new IndexOutOfBoundsException("" + index);
+            throw new IndexOutOfBoundsException(Integer.toString(index));
         }
         return bits.get(index);
     }

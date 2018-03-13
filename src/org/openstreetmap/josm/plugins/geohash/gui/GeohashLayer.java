@@ -19,8 +19,8 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -47,7 +47,7 @@ import net.exfidefortis.map.BoundingBox;
  *
  * @author laurad
  */
-public class GeohashLayer extends Layer {
+public final class GeohashLayer extends Layer {
 
 
     private static GeohashLayer INSTANCE;
@@ -61,19 +61,7 @@ public class GeohashLayer extends Layer {
     private GeohashLayer() {
         super(Configurer.getINSTANCE().getPluginName());
         paintHandler = new PaintHandler();
-        final Bounds worldBounds = Main.getProjection().getWorldBoundsLatLon();
-        try {
-            geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
-            final BoundingBox mapViewBounds =
-                    Convert.convertBoundsToBoundingBox(MainApplication.getMap().mapView.getRealBounds());
-            final Optional<Geohash> geoParent =
-                    geohashes.stream().filter(geohash -> geohash.bounds().contains(mapViewBounds)).findFirst();
-            if (geoParent.isPresent()) {
-                geohashes.addAll(GeohashIdentifier.getAllInView(geoParent.get().bounds(), mapViewBounds));
-            }
-        } catch (final IllegalArgumentException e) {
-            geohashes = (Set<Geohash>) GeohashIdentifier.get(Configurer.getWorldBorder());
-        }
+        geohashes = new HashSet<>();
     }
 
     public static GeohashLayer getInstance() {
@@ -83,13 +71,16 @@ public class GeohashLayer extends Layer {
         return INSTANCE;
     }
 
-    public void destroyInstance() {
+    public static void destroyInstance() {
         INSTANCE = null;
     }
 
     @Override
     public void paint(final Graphics2D graphics, final MapView mapView, final Bounds bounds) {
         mapView.setDoubleBuffered(true);
+        final BoundingBox mapViewBounds = Convert.convertBoundsToBoundingBox(MainApplication.getMap().mapView
+                .getProjection().getLatLonBoundsBox(MainApplication.getMap().mapView.getProjectionBounds()));
+        geohashes.addAll(GeohashIdentifier.get(mapViewBounds));
         setColors();
         for (final Geohash geohash : geohashes) {
             paintHandler.drawGeohash(graphics, mapView, geohash, false, visibleZoomLevels);
@@ -143,7 +134,7 @@ public class GeohashLayer extends Layer {
                 MainApplication.getMap().mapView,
                 selectedGeohash, true, visibleZoomLevels);
     }
-    
+
     public Geohash getSelectedGeohash() {
         return selectedGeohash;
     }

@@ -50,9 +50,9 @@ public class PaintHandler {
     private static final String IMAGERY = "imagery";
     private static final String MAPBOX_SATELLITE = "Mapbox Satellite";
 
-    private final Color LINE_COLOR_LIGHT_BACKGROUND = new Color(0, 0, 255);
-    private final Color LINE_COLOR_DARK_BACKGROUND = new Color(51, 255, 255);
-    private final Color SELECTED_LINE_COLOR = new Color(255, 0, 0);
+    private static final Color LINE_COLOR_LIGHT_BACKGROUND = new Color(0, 0, 255);
+    private static final Color LINE_COLOR_DARK_BACKGROUND = new Color(51, 255, 255);
+    private static final Color SELECTED_LINE_COLOR = new Color(255, 0, 0);
     private Color lineColor;
 
 
@@ -93,22 +93,22 @@ public class PaintHandler {
      * @return geohashPath
      */
     public GeneralPath getGeohashPath(final Geohash geohash, final MapView mapView) {
-        final Latitude N = geohash.bounds().north();
-        final Longitude W = geohash.bounds().west();
-        final Latitude S = geohash.bounds().south();
-        final Longitude E = geohash.bounds().east();
+        final Latitude north = geohash.bounds().north();
+        final Longitude west = geohash.bounds().west();
+        final Latitude south = geohash.bounds().south();
+        final Longitude east = geohash.bounds().east();
 
-        final LatLon NW = new LatLon(Convert.fitLatitudeInBounds(N.asDegrees()), W.asDegrees());
-        final LatLon NE = new LatLon(Convert.fitLatitudeInBounds(N.asDegrees()), E.asDegrees());
-        final LatLon SW = new LatLon(Convert.fitLatitudeInBounds(S.asDegrees()), W.asDegrees());
-        final LatLon SE = new LatLon(Convert.fitLatitudeInBounds(S.asDegrees()), E.asDegrees());
+        final LatLon northWest = new LatLon(Convert.fitLatitudeInBounds(north.asDegrees()), west.asDegrees());
+        final LatLon northEast = new LatLon(Convert.fitLatitudeInBounds(north.asDegrees()), east.asDegrees());
+        final LatLon southWest = new LatLon(Convert.fitLatitudeInBounds(south.asDegrees()), west.asDegrees());
+        final LatLon southEast = new LatLon(Convert.fitLatitudeInBounds(south.asDegrees()), east.asDegrees());
 
         final GeneralPath path = new GeneralPath();
-        path.moveTo(mapView.getPoint(NW).getX(), mapView.getPoint(NW).getY());
-        path.lineTo(mapView.getPoint(SW).getX(), mapView.getPoint(SW).getY());
-        path.lineTo(mapView.getPoint(SE).getX(), mapView.getPoint(SE).getY());
-        path.lineTo(mapView.getPoint(NE).getX(), mapView.getPoint(NE).getY());
-        path.lineTo(mapView.getPoint(NW).getX(), mapView.getPoint(NW).getY());
+        path.moveTo(mapView.getPoint(northWest).getX(), mapView.getPoint(northWest).getY());
+        path.lineTo(mapView.getPoint(southWest).getX(), mapView.getPoint(southWest).getY());
+        path.lineTo(mapView.getPoint(southEast).getX(), mapView.getPoint(southEast).getY());
+        path.lineTo(mapView.getPoint(northEast).getX(), mapView.getPoint(northEast).getY());
+        path.lineTo(mapView.getPoint(northWest).getX(), mapView.getPoint(northWest).getY());
 
         return path;
     }
@@ -116,8 +116,8 @@ public class PaintHandler {
     public Point getTextPoint(final Geohash geohash, final MapView mapView) {
         final double latitude = Convert.fitLatitudeInBounds(geohash.bounds().north().asDegrees());
         final double longitude = geohash.bounds().west().asDegrees();
-        final LatLon NW = new LatLon(latitude, longitude);
-        final Point textPoint = mapView.getPoint(NW);
+        final LatLon northWest = new LatLon(latitude, longitude);
+        final Point textPoint = mapView.getPoint(northWest);
         textPoint.translate(TRANSLATION_20, TRANSLATION_20);
         return textPoint;
     }

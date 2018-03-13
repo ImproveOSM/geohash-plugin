@@ -23,7 +23,7 @@ public class Angle implements Comparable<Angle> {
      * @param degrees the longitude value in decimal degrees
      * @return a new angle object
      */
-    public static Angle forDegrees(double degrees) {
+    public static Angle forDegrees(final double degrees) {
         return new Angle(degrees);
     }
 
@@ -32,7 +32,7 @@ public class Angle implements Comparable<Angle> {
      * @param radians the longitude value in radians
      * @return a new angle object
      */
-    public static Angle forRadians(double radians) {
+    public static Angle forRadians(final double radians) {
         return new Angle(Math.toDegrees(radians));
     }
 
@@ -48,19 +48,19 @@ public class Angle implements Comparable<Angle> {
      * @param maximumDegreeValue the maximum allowed value for this kind of
      * angle
      */
-    protected Angle(double degrees, double minimumDegreeValue,
-            double maximumDegreeValue) {
+    protected Angle(final double degrees, final double minimumDegreeValue,
+            final double maximumDegreeValue) {
         if (degrees < minimumDegreeValue || degrees > maximumDegreeValue) {
             throw new IllegalArgumentException(
                     "Value out of range: " + degrees
-                            + "; allowed values are in the interval ["
-                            + minimumDegreeValue + "," + maximumDegreeValue
-                            + "]");
+                    + "; allowed values are in the interval ["
+                    + minimumDegreeValue + "," + maximumDegreeValue
+                    + "]");
         }
         this.degrees = degrees;
     }
 
-    protected Angle(double degrees) {
+    protected Angle(final double degrees) {
         this(degrees, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
@@ -84,19 +84,19 @@ public class Angle implements Comparable<Angle> {
     }
 
 
-    public Angle add(Angle other) {
+    public Angle add(final Angle other) {
         return Angle.forDegrees(degrees + other.degrees);
     }
 
-    public Angle subtract(Angle other) {
+    public Angle subtract(final Angle other) {
         return Angle.forDegrees(degrees - other.degrees);
     }
 
-    public Angle multiply(double value) {
+    public Angle multiply(final double value) {
         return Angle.forDegrees(degrees * value);
     }
 
-    public Angle divide(double value) {
+    public Angle divide(final double value) {
         return Angle.forDegrees(degrees / value);
     }
 
@@ -110,7 +110,7 @@ public class Angle implements Comparable<Angle> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -124,11 +124,11 @@ public class Angle implements Comparable<Angle> {
 
     @Override
     public String toString() {
-        return "" + degrees;
+        return Double.toString(degrees);
     }
 
     @Override
-    public int compareTo(Angle other) {
+    public int compareTo(final Angle other) {
         return Double.compare(asDegrees(), other.asDegrees());
     }
 }

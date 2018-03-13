@@ -3,8 +3,6 @@ package org.openstreetmap.josm.plugins.geohash;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -17,8 +15,6 @@ import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MainMenu;
 import org.openstreetmap.josm.gui.MapFrame;
-import org.openstreetmap.josm.gui.NavigatableComponent;
-import org.openstreetmap.josm.gui.NavigatableComponent.ZoomChangeListener;
 import org.openstreetmap.josm.gui.layer.LayerManager.LayerAddEvent;
 import org.openstreetmap.josm.gui.layer.LayerManager.LayerChangeListener;
 import org.openstreetmap.josm.gui.layer.LayerManager.LayerOrderChangeEvent;
@@ -27,7 +23,6 @@ import org.openstreetmap.josm.gui.layer.TMSLayer;
 import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
 import org.openstreetmap.josm.plugins.geohash.core.Geohash;
-import org.openstreetmap.josm.plugins.geohash.core.GeohashIdentifier;
 import org.openstreetmap.josm.plugins.geohash.gui.GeohashLayer;
 import org.openstreetmap.josm.plugins.geohash.gui.GeohashSearchDialog;
 import org.openstreetmap.josm.plugins.geohash.util.PreferenceManager;
@@ -41,13 +36,13 @@ import org.openstreetmap.josm.tools.ImageProvider;
  * @author laurad
  */
 public class GeohashPlugin extends Plugin
-implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener, MouseMotionListener {
+implements LayerChangeListener, MouseListener, MouseMotionListener {
 
-    private GeohashSearchDialog searchDialog;
+    private static final int MIN_CODE_LENGTH = 1;
+    private static final int MAX_ATTEMPTS = 3;
+    private static final int DOUBLE_CLICK = 2;
     private GeohashLayer layer;
     private JMenuItem layerMenu;
-    /** Shift key is considered zoom key */
-    private boolean zoomKeyPressed = false;
 
     /**
      * @param info
@@ -85,28 +80,8 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener, 
      * @param newMapFrame
      */
     private void initializeDialog(final MapFrame newMapFrame) {
-        searchDialog = new GeohashSearchDialog();
+        final GeohashSearchDialog searchDialog = new GeohashSearchDialog();
         newMapFrame.addToggleDialog(searchDialog);
-    }
-
-
-    /**
-     * The zoom even is captured by this method. If during the zoom event, the Shift key is pressed, the area containing
-     * the current mouse position has it's inner geohashes calculated.
-     */
-    @Override
-    public void zoomChanged() {
-        if (zoomKeyPressed) {
-            final LatLon mouseCoordinates = getMouseCoordinates();
-            if (mouseCoordinates != null) {
-                final Optional<Geohash> zoomedHash = getSelectedGeohash(mouseCoordinates);
-                if (zoomedHash.isPresent()) {
-                    final Set<Geohash> newGeohashes = (Set<Geohash>) GeohashIdentifier.get(zoomedHash.get().bounds());
-                    layer.addGeohashes(newGeohashes);
-                    layer.clearSelectedGeohash();
-                }
-            }
-        }
     }
 
     @Override
@@ -120,28 +95,24 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener, 
     @Override
     public void layerRemoving(final LayerRemoveEvent e) {
         if (e.getRemovedLayer() instanceof GeohashLayer) {
-            layer.destroyInstance();
+            GeohashLayer.destroyInstance();
             unregisterListeners();
             layer = null;
         } else {
             layer.setColors();
         }
-        if (MainApplication.getLayerManager().getLayersOfType(TMSLayer.class).size() == 0) {
+        if (MainApplication.getLayerManager().getLayersOfType(TMSLayer.class).isEmpty()) {
             layerMenu.setEnabled(false);
         }
     }
 
     public void registerListeners() {
-        NavigatableComponent.addZoomChangeListener(this);
-        MainApplication.getMap().mapView.addKeyListener(this);
         MainApplication.getLayerManager().addLayerChangeListener(this);
         MainApplication.getMap().mapView.addMouseListener(this);
         MainApplication.getMap().mapView.addMouseMotionListener(this);
     }
 
     public void unregisterListeners() {
-        NavigatableComponent.removeZoomChangeListener(this);
-        MainApplication.getMap().mapView.removeKeyListener(this);
         MainApplication.getLayerManager().removeLayerChangeListener(this);
         MainApplication.getMap().mapView.removeMouseListener(this);
         MainApplication.getMap().mapView.removeMouseMotionListener(this);
@@ -152,25 +123,6 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener, 
         // not required
     }
 
-    @Override
-    public void keyTyped(final KeyEvent e) {
-        // not required
-    }
-
-    @Override
-    public void keyPressed(final KeyEvent e) {
-        if (e.isShiftDown()) {
-            zoomKeyPressed = true;
-        }
-    }
-
-    @Override
-    public void keyReleased(final KeyEvent e) {
-        if (!e.isShiftDown()) {
-            zoomKeyPressed = false;
-        }
-    }
-
     /**
      * Used to return the coordinates of the mouse position on screen in JOSM LatLon format.
      *
@@ -178,12 +130,8 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener, 
      */
     private LatLon getMouseCoordinates() {
         final Point mousePoint = MainApplication.getMap().mapView.getMousePosition();
-        if (mousePoint != null) {
-            final LatLon mouseCoordinates =
-                    MainApplication.getMap().mapView.getLatLon(mousePoint.getX(), mousePoint.getY());
-            return mouseCoordinates;
-        }
-        return null;
+        return mousePoint != null ? MainApplication.getMap().mapView.getLatLon(mousePoint.getX(), mousePoint.getY())
+                : null;
     }
 
     /**
@@ -192,28 +140,30 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener, 
      */
     @Override
     public void mouseClicked(final MouseEvent e) {
-        if (e.getClickCount() == 2) {
+        if (e.getClickCount() == DOUBLE_CLICK) {
             int attempts = 0;
             LatLon mouseCoordinates = getMouseCoordinates();
-            while (mouseCoordinates == null && attempts < 3) {
+            while (mouseCoordinates == null && attempts < MAX_ATTEMPTS) {
                 mouseCoordinates = getMouseCoordinates();
                 attempts++;
             }
             if (mouseCoordinates != null) {
                 final LatLon mousePosition = mouseCoordinates;
                 final Optional<Geohash> zoomedHash = getSelectedGeohash(mousePosition);
-                if (zoomedHash.isPresent() && zoomedHash.get().code().length() > 1) {
+                if (zoomedHash.isPresent() && zoomedHash.get().code().length() > MIN_CODE_LENGTH) {
                     final String zoomedGeohash = zoomedHash.get().code();
                     final Set<Geohash> toBeDeleted = layer.getGeohashes().stream().filter(geohash -> {
                         return (geohash.code().length() >= zoomedGeohash.length())
-                                && geohash.code().startsWith(zoomedGeohash.substring(0, zoomedGeohash.length() - 1));
+                                && geohash.code().startsWith(
+                                        zoomedGeohash.substring(0, zoomedGeohash.length() - MIN_CODE_LENGTH));
                     }).collect(Collectors.toSet());
                     layer.removeGeohashes(toBeDeleted);
                 }
-                if (zoomedHash.isPresent() && zoomedHash.get().code().length() == 1) {
+                if (zoomedHash.isPresent() && zoomedHash.get().code().length() == MIN_CODE_LENGTH) {
                     final String zoomedGeohash = zoomedHash.get().code();
-                    final Set<Geohash> toBeDeleted = this.layer.getGeohashes().stream().filter(geohash -> {
-                        return geohash.code().startsWith(zoomedGeohash.substring(0, zoomedGeohash.length() - 1));
+                    final Set<Geohash> toBeDeleted = layer.getGeohashes().stream().filter(geohash -> {
+                        return geohash.code()
+                                .startsWith(zoomedGeohash.substring(0, zoomedGeohash.length() - MIN_CODE_LENGTH));
                     }).collect(Collectors.toSet());
                     layer.removeGeohashes(toBeDeleted);
                 }
@@ -230,9 +180,8 @@ implements ZoomChangeListener, LayerChangeListener, KeyListener, MouseListener, 
      */
     private Optional<Geohash> getSelectedGeohash(final LatLon mousePosition) {
         if (mousePosition != null) {
-            return layer.getGeohashes().stream().filter(geohash -> {
-                return geohash.containsPoint(mousePosition);
-            }).max((g1, g2) -> Integer.compare(g1.code().length(), g2.code().length()));
+            return layer.getGeohashes().stream().filter(geohash -> geohash.containsPoint(mousePosition))
+                    .max((g1, g2) -> Integer.compare(g1.code().length(), g2.code().length()));
         }
         return Optional.empty();
     }

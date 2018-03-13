@@ -16,7 +16,7 @@ package net.exfidefortis.map;
  * away internal representation
  * @author Mihai Chintoanu
  */
-public class Latitude extends Angle {
+public final class Latitude extends Angle {
 
     public static final double MINIMUM_DEGREE_VALUE = -90;
     public static final double MAXIMUM_DEGREE_VALUE = 90;

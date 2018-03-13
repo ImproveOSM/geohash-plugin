@@ -81,11 +81,7 @@ public class Geohash {
     }
 
     public boolean containsPoint(final LatLon point) {
-        if (point.lat() <= bounds.north().asDegrees() && point.lat() >= bounds.south().asDegrees()
-                && point.lon() >= bounds.west().asDegrees() && point.lon() <= bounds.east().asDegrees()) {
-            return true;
-        } else {
-            return false;
-        }
+        return (point.lat() <= bounds.north().asDegrees()) && (point.lat() >= bounds.south().asDegrees())
+                && (point.lon() >= bounds.west().asDegrees()) && (point.lon() <= bounds.east().asDegrees());
     }
 }

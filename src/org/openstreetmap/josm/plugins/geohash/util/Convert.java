@@ -12,7 +12,7 @@ import net.exfidefortis.map.Longitude;
  *
  * @author laurad
  */
-public class Convert {
+public final class Convert {
 
     public static final int MIN_ZOOM = 0;
     public static final int MAX_ZOOM = 25;
@@ -21,6 +21,8 @@ public class Convert {
     private static final int ZOOM_CONST = 2;
     private static final double JOSM_MAX_LATITUDE = 85.05112877980659;
     private static final double JOSM_MIN_LATITUDE = -85.05112877980659;
+
+    private Convert() {}
 
 
     /**

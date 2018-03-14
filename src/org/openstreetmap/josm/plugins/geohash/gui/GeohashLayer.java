@@ -130,9 +130,11 @@ public final class GeohashLayer extends Layer {
 
     public void setSelectedGeohash(final Geohash geohash) {
         selectedGeohash = geohash;
-        paintHandler.drawGeohash((Graphics2D) MainApplication.getMap().mapView.getGraphics(),
-                MainApplication.getMap().mapView,
-                selectedGeohash, true, visibleZoomLevels);
+        if (this.isVisible()) {
+            paintHandler.drawGeohash((Graphics2D) MainApplication.getMap().mapView.getGraphics(),
+                    MainApplication.getMap().mapView,
+                    selectedGeohash, true, visibleZoomLevels);
+        }
     }
 
     public Geohash getSelectedGeohash() {
@@ -140,7 +142,7 @@ public final class GeohashLayer extends Layer {
     }
 
     public void clearSelectedGeohash() {
-        if (selectedGeohash != null) {
+        if (selectedGeohash != null && this.isVisible()) {
             paintHandler.drawGeohash((Graphics2D) MainApplication.getMap().mapView.getGraphics(),
                     MainApplication.getMap().mapView,
                     selectedGeohash, false, visibleZoomLevels);

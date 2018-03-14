@@ -1,6 +1,8 @@
 package org.openstreetmap.josm.plugins.geohash.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import org.openstreetmap.josm.plugins.geohash.util.Convert;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.Shortcut;
 import com.telenav.josm.common.gui.builder.ButtonBuilder;
+import com.telenav.josm.common.gui.builder.TextComponentBuilder;
 
 
 /**
@@ -32,8 +35,9 @@ public class GeohashSearchDialog extends ToggleDialog {
     private static final long serialVersionUID = -8605852967336765994L;
 
     /** the preferred dimension of the panel components */
-    private static final Dimension DIM = new Dimension(50, 100);
+    private static final Dimension DIM = new Dimension(50, 70);
     private final Dimension INPUT_DIM = new Dimension(Integer.MAX_VALUE, 20);
+    private static final Color WHITE = new Color(255, 255, 255);
     private static final int DLG_HEIGHT = 50;
     private static final Configurer CONFIG = Configurer.getINSTANCE();
     private final JPanel searchContainer;
@@ -51,7 +55,7 @@ public class GeohashSearchDialog extends ToggleDialog {
         searchContainer.setPreferredSize(DIM);
         searchContainer.add(new JLabel(" "));
 
-        searchInput = new JTextField(20);
+        searchInput = TextComponentBuilder.buildTextField("", Font.PLAIN, WHITE, 20);
         searchInput.setMaximumSize(INPUT_DIM);
         searchInput.addKeyListener(new java.awt.event.KeyAdapter() {
 
@@ -69,11 +73,9 @@ public class GeohashSearchDialog extends ToggleDialog {
         searchContainer.add(new JLabel(" "));
         searchContainer.add(searchButton);
 
-        searchOutput = new JTextArea();
-        searchOutput.setEditable(false);
+        searchOutput = TextComponentBuilder.buildTextArea("", this.getBackground(), false);
         searchOutput.setLineWrap(true);
         searchOutput.setWrapStyleWord(true);
-        searchOutput.setBackground(this.getBackground());
         searchContainer.add(searchOutput);
 
         add(createLayout(searchContainer, false, null));

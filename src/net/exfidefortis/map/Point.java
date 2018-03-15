@@ -27,7 +27,7 @@ public class Point {
      * @param longitude the longitude of this geo position
      * @param latitude the latitude of this geo position
      */
-    public Point(Longitude longitude, Latitude latitude) {
+    public Point(final Longitude longitude, final Latitude latitude) {
         if (longitude == null || latitude == null) {
             throw new IllegalArgumentException(
                     "The longitude and latitude must both be not null");
@@ -53,7 +53,7 @@ public class Point {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }

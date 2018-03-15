@@ -14,7 +14,7 @@ import net.exfidefortis.map.Longitude;
  *
  * @author laurad
  */
-public class Configurer extends BaseConfig {
+public final class Configurer extends BaseConfig {
 
     private static final int MAX_VISIBILITY_LVL = 15;
     private final static int ZOOM_STEP_LVL_3 = 3;

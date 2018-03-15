@@ -50,7 +50,7 @@ import net.exfidefortis.map.BoundingBox;
 public final class GeohashLayer extends Layer {
 
 
-    private static GeohashLayer INSTANCE;
+    private static GeohashLayer instance;
     private Set<Geohash> geohashes;
     private Geohash selectedGeohash = null;
 
@@ -65,14 +65,14 @@ public final class GeohashLayer extends Layer {
     }
 
     public static GeohashLayer getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new GeohashLayer();
+        if (instance == null) {
+            instance = new GeohashLayer();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public static void destroyInstance() {
-        INSTANCE = null;
+        instance = null;
     }
 
     @Override

@@ -22,10 +22,10 @@ import org.openstreetmap.josm.Main;
  * @author laurad
  * @version $Revision$
  */
-public class PreferenceManager {
+public final class PreferenceManager {
 
-    private static String LAYER_OPENED = "geohash.layer.opened";
-    private static PreferenceManager INSTANCE = new PreferenceManager();
+    private static final String LAYER_OPENED = "geohash.layer.opened";
+    private static final PreferenceManager INSTANCE = new PreferenceManager();
 
     private PreferenceManager() {}
 

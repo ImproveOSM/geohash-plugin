@@ -36,7 +36,7 @@ public class GeohashSearchDialog extends ToggleDialog {
 
     /** the preferred dimension of the panel components */
     private static final Dimension DIM = new Dimension(50, 70);
-    private final Dimension INPUT_DIM = new Dimension(Integer.MAX_VALUE, 20);
+    private static final Dimension INPUT_DIM = new Dimension(Integer.MAX_VALUE, 20);
     private static final Color WHITE = new Color(255, 255, 255);
     private static final int DLG_HEIGHT = 50;
     private static final Configurer CONFIG = Configurer.getINSTANCE();

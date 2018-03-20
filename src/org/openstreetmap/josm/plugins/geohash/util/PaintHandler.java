@@ -1,17 +1,7 @@
 /*
- *  Copyright 2018 Telenav, Inc.
+ * The code is licensed under the GPL Version 3 license https://www.gnu.org/licenses/quick-guide-gplv3.html.
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Copyright (c)2017, Telenav, Inc. All Rights Reserved
  */
 package org.openstreetmap.josm.plugins.geohash.util;
 
@@ -22,7 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
@@ -43,7 +33,6 @@ import net.exfidefortis.map.Longitude;
 public class PaintHandler {
 
     private static final int STROKE_WIDTH_2 = 2;
-    private static final int TRANSLATION_20 = 40;
     private static final int FONT_SIZE = 13;
     private static final String FONT_NAME = "Verdana";
 
@@ -68,7 +57,7 @@ public class PaintHandler {
      * @param geohash
      */
     public void drawGeohash(final Graphics2D graphics, final MapView mapView, final Geohash geohash,
-            final boolean isSelected, final Map<Integer, Integer> visibleZoomLevels) {
+            final boolean isSelected, final boolean hasChildren) {
         final GeneralPath path = getGeohashPath(geohash, mapView);
         if (isSelected) {
             graphics.setColor(SELECTED_LINE_COLOR);
@@ -77,9 +66,8 @@ public class PaintHandler {
         }
         graphics.setStroke(new BasicStroke(STROKE_WIDTH_2));
         graphics.draw(path);
-        final int zoomLevel = Convert.boundsToZoomLevel(mapView.getRealBounds());
-        if (geohash.code().length() <= visibleZoomLevels.get(zoomLevel)) {
-            final Point textPoint = getTextPoint(geohash, mapView);
+        if (geohash.isCodeVisible() && !hasChildren) {
+            final Point textPoint = getTextPoint(geohash, mapView, geohash.code(), graphics);
             PaintManager.drawText(graphics, geohash.code(), textPoint, new Font(FONT_NAME, Font.BOLD, FONT_SIZE),
                     lineColor);
         }
@@ -113,13 +101,15 @@ public class PaintHandler {
         return path;
     }
 
-    public Point getTextPoint(final Geohash geohash, final MapView mapView) {
+    public Point getTextPoint(final Geohash geohash, final MapView mapView, final String text,
+            final Graphics2D graphics) {
         final double latitude = Convert.fitLatitudeInBounds(geohash.bounds().north().asDegrees());
         final double longitude = geohash.bounds().west().asDegrees();
         final LatLon northWest = new LatLon(latitude, longitude);
         final Point textPoint = mapView.getPoint(northWest);
-        textPoint.translate(TRANSLATION_20, TRANSLATION_20);
-        return textPoint;
+        textPoint.translate(graphics.getFontMetrics().stringWidth(text) / 2, graphics.getFontMetrics().getHeight());
+        return new Point((int) textPoint.getX(), (int) textPoint.getY());
+
     }
 
     /**
@@ -139,5 +129,25 @@ public class PaintHandler {
         } else {
             lineColor = LINE_COLOR_LIGHT_BACKGROUND;
         }
+    }
+
+    /**
+     * @param geohashes
+     * @param graphics
+     * @param mapView
+     * @return
+     */
+    public Set<Geohash> setCodeVisibility(final Set<Geohash> geohashes, final Graphics2D graphics,
+            final MapView mapView) {
+        for (final Geohash geohash : geohashes) {
+            final GeneralPath path = getGeohashPath(geohash, mapView);
+            if ((graphics.getFontMetrics().stringWidth(geohash.code()) < (path.getBounds().getWidth() - 20))
+                    && (graphics.getFontMetrics().getHeight() < path.getBounds().height)) {
+                geohash.setCodeVisibility(true);
+            } else {
+                geohash.setCodeVisibility(false);
+            }
+        }
+        return geohashes;
     }
 }

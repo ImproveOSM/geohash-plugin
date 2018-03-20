@@ -1,3 +1,8 @@
+/*
+ * The code is licensed under the GPL Version 3 license https://www.gnu.org/licenses/quick-guide-gplv3.html.
+ *
+ * Copyright (c)2017, Telenav, Inc. All Rights Reserved
+ */
 package org.openstreetmap.josm.plugins.geohash.util;
 
 import org.openstreetmap.josm.data.Bounds;
@@ -15,7 +20,7 @@ import net.exfidefortis.map.Longitude;
 public final class Convert {
 
     public static final int MIN_ZOOM = 0;
-    public static final int MAX_ZOOM = 25;
+    public static final int MAX_ZOOM = 26;
     private static final int TILE_SIZE = 1024;
     private static final int ZOOM1_SCALE = 78206;
     private static final int ZOOM_CONST = 2;
@@ -46,7 +51,8 @@ public final class Convert {
      * @return Bounds
      */
     public static Bounds convertBoundingBoxToBounds(final BoundingBox bounds) {
-        return new Bounds(bounds.south().asDegrees(), bounds.west().asDegrees(), bounds.north().asDegrees(),
+        return new Bounds(fitLatitudeInBounds(bounds.south().asDegrees()), bounds.west().asDegrees(),
+                fitLatitudeInBounds(bounds.north().asDegrees()),
                 bounds.east().asDegrees());
     }
 

@@ -1,3 +1,8 @@
+/*
+ * The code is licensed under the GPL Version 3 license https://www.gnu.org/licenses/quick-guide-gplv3.html.
+ *
+ * Copyright (c)2017, Telenav, Inc. All Rights Reserved
+ */
 package org.openstreetmap.josm.plugins.geohash.core;
 
 import java.util.ArrayList;

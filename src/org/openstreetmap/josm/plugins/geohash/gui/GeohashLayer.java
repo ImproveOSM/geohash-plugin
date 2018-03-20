@@ -1,17 +1,7 @@
 /*
- *  Copyright 2018 Telenav, Inc.
+ * The code is licensed under the GPL Version 3 license https://www.gnu.org/licenses/quick-guide-gplv3.html.
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Copyright (c)2017, Telenav, Inc. All Rights Reserved
  */
 package org.openstreetmap.josm.plugins.geohash.gui;
 
@@ -20,7 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -54,8 +43,6 @@ public final class GeohashLayer extends Layer {
     private Set<Geohash> geohashes;
     private Geohash selectedGeohash = null;
 
-    /** Map containing zoom level and code lengths to be shown in order to avoid overlapping */
-    private final Map<Integer, Integer> visibleZoomLevels = Configurer.getINSTANCE().getCodeVizibilityLevels();
     private final PaintHandler paintHandler;
 
     private GeohashLayer() {
@@ -81,12 +68,15 @@ public final class GeohashLayer extends Layer {
         final BoundingBox mapViewBounds = Convert.convertBoundsToBoundingBox(MainApplication.getMap().mapView
                 .getProjection().getLatLonBoundsBox(MainApplication.getMap().mapView.getProjectionBounds()));
         geohashes.addAll(GeohashIdentifier.get(mapViewBounds));
+        geohashes = paintHandler.setCodeVisibility(geohashes, graphics, mapView);
         setColors();
         for (final Geohash geohash : geohashes) {
-            paintHandler.drawGeohash(graphics, mapView, geohash, false, visibleZoomLevels);
+            paintHandler.drawGeohash(graphics, mapView, geohash, false,
+                    geohash.hasVisibleChildren(geohashes));
         }
         if (selectedGeohash != null) {
-            paintHandler.drawGeohash(graphics, mapView, selectedGeohash, true, visibleZoomLevels);
+            paintHandler.drawGeohash(graphics, mapView, selectedGeohash, true,
+                    selectedGeohash.hasVisibleChildren(geohashes));
         }
     }
 
@@ -133,7 +123,7 @@ public final class GeohashLayer extends Layer {
         if (this.isVisible()) {
             paintHandler.drawGeohash((Graphics2D) MainApplication.getMap().mapView.getGraphics(),
                     MainApplication.getMap().mapView,
-                    selectedGeohash, true, visibleZoomLevels);
+                    selectedGeohash, true, selectedGeohash.hasVisibleChildren(geohashes));
         }
     }
 
@@ -145,7 +135,7 @@ public final class GeohashLayer extends Layer {
         if (selectedGeohash != null && this.isVisible()) {
             paintHandler.drawGeohash((Graphics2D) MainApplication.getMap().mapView.getGraphics(),
                     MainApplication.getMap().mapView,
-                    selectedGeohash, false, visibleZoomLevels);
+                    selectedGeohash, false, selectedGeohash.hasVisibleChildren(geohashes));
             selectedGeohash = null;
         }
     }

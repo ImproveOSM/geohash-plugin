@@ -1,8 +1,15 @@
+/*
+ * The code is licensed under the GPL Version 3 license https://www.gnu.org/licenses/quick-guide-gplv3.html.
+ *
+ * Copyright (c)2017, Telenav, Inc. All Rights Reserved
+ */
 package org.openstreetmap.josm.plugins.geohash.core;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import org.openstreetmap.josm.data.coor.LatLon;
 import net.exfidefortis.map.BoundingBox;
 import net.exfidefortis.map.Point;
@@ -20,6 +27,7 @@ public class Geohash {
 
     private final String code;
     private transient BoundingBox bounds;
+    private boolean codeVisibility;
 
     public Geohash(final String code) {
         if (code == null) {
@@ -37,6 +45,14 @@ public class Geohash {
 
     public String code() {
         return code;
+    }
+
+    public void setCodeVisibility(final boolean codeVisibility) {
+        this.codeVisibility = codeVisibility;
+    }
+
+    public boolean isCodeVisible() {
+        return this.codeVisibility;
     }
 
     public BoundingBox bounds() {
@@ -83,5 +99,18 @@ public class Geohash {
     public boolean containsPoint(final LatLon point) {
         return (point.lat() <= bounds.north().asDegrees()) && (point.lat() >= bounds.south().asDegrees())
                 && (point.lon() >= bounds.west().asDegrees()) && (point.lon() <= bounds.east().asDegrees());
+    }
+
+    /**
+     * Returns true if the geohash has any children in the provided list and false otherwise.
+     *
+     * @param geohashes
+     * @return
+     */
+    public boolean hasVisibleChildren(final Set<Geohash> geohashes) {
+        final Optional<Geohash> child =
+                geohashes.stream().filter(g -> g.code().startsWith(this.code) && !g.code().equals(this.code)
+                        && g.isCodeVisible()).findAny();
+        return child.isPresent() ? true : false;
     }
 }

@@ -1,8 +1,10 @@
+/*
+ * The code is licensed under the GPL Version 3 license https://www.gnu.org/licenses/quick-guide-gplv3.html.
+ *
+ * Copyright (c)2017, Telenav, Inc. All Rights Reserved
+ */
 package org.openstreetmap.josm.plugins.geohash.util.config;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.openstreetmap.josm.plugins.geohash.util.Convert;
 import com.telenav.josm.common.cnf.BaseConfig;
 import net.exfidefortis.map.BoundingBox;
 import net.exfidefortis.map.Latitude;
@@ -16,9 +18,6 @@ import net.exfidefortis.map.Longitude;
  */
 public final class Configurer extends BaseConfig {
 
-    private static final int MAX_VISIBILITY_LVL = 15;
-    private final static int ZOOM_STEP_LVL_3 = 3;
-    private final static int ZOOM_STEP_LVL_2 = 2;
     private final static String CONFIG_FILE = "geohash.properties";
     private final static Configurer INSTANCE = new Configurer();
     private final String pluginName;
@@ -89,32 +88,6 @@ public final class Configurer extends BaseConfig {
 
     public String getLayerTooltipText() {
         return layerTooltipText;
-    }
-
-    /**
-     * Computes a map containing zoom levels as keys and code lengths as values. Only codes with length equal or smaller
-     * will be written for each zoom level. This prevents the drawing of unreadable text.
-     *
-     * @return Map<Integer, Integer>
-     */
-    public Map<Integer, Integer> getCodeVizibilityLevels() {
-        final Map<Integer, Integer> visibilityLevels = new HashMap<>();
-        int codeLength = 1;
-        for (int i = 1; i <= Convert.MAX_ZOOM; i++) {
-            visibilityLevels.put(i, codeLength);
-            if (i <= MAX_VISIBILITY_LVL) {
-                if (i % ZOOM_STEP_LVL_3 == 0) {
-                    codeLength++;
-                }
-            } else {
-                if (i % ZOOM_STEP_LVL_2 != 0) {
-                    codeLength++;
-                }
-            }
-        }
-        /** Noticed exceptions in levels */
-        visibilityLevels.replace(15, 6);
-        return visibilityLevels;
     }
 
     /**

@@ -32,6 +32,8 @@ import net.exfidefortis.map.Longitude;
  */
 public class PaintHandler {
 
+    private static final int TRANSLATE_X = 5;
+    private static final int TRANSLATE_Y = 10;
     private static final int STROKE_WIDTH_2 = 2;
     private static final int FONT_SIZE = 13;
     private static final String FONT_NAME = "Verdana";
@@ -107,7 +109,7 @@ public class PaintHandler {
         final double longitude = geohash.bounds().west().asDegrees();
         final LatLon northWest = new LatLon(latitude, longitude);
         final Point textPoint = mapView.getPoint(northWest);
-        textPoint.translate(graphics.getFontMetrics().stringWidth(text) / 2, graphics.getFontMetrics().getHeight());
+        textPoint.translate(graphics.getFontMetrics().stringWidth(text) / 2 + TRANSLATE_X, TRANSLATE_Y);
         return new Point((int) textPoint.getX(), (int) textPoint.getY());
 
     }
@@ -132,6 +134,10 @@ public class PaintHandler {
     }
 
     /**
+     * This method sets the codeVisibility attribute for every geohash in the list by checking if the geohash code can
+     * fit in the drawn rectangle. The text width is rounded to the nearest multiple of 10 and is compared to half the
+     * width of the rectangle.
+     *
      * @param geohashes
      * @param graphics
      * @param mapView
@@ -141,8 +147,10 @@ public class PaintHandler {
             final MapView mapView) {
         for (final Geohash geohash : geohashes) {
             final GeneralPath path = getGeohashPath(geohash, mapView);
-            if ((graphics.getFontMetrics().stringWidth(geohash.code()) < (path.getBounds().getWidth() - 20))
-                    && (graphics.getFontMetrics().getHeight() < path.getBounds().height)) {
+            final int textWidthRounded = (graphics.getFontMetrics().stringWidth(geohash.code()) / 10) * 10 + 10;
+            final int textHeight = graphics.getFontMetrics().getHeight();
+            if ((textWidthRounded <= (path.getBounds().getWidth() / 2 + TRANSLATE_X))
+                    && (textHeight < path.getBounds().height)) {
                 geohash.setCodeVisibility(true);
             } else {
                 geohash.setCodeVisibility(false);

@@ -6,9 +6,6 @@
 package org.openstreetmap.josm.plugins.geohash.util.config;
 
 import com.telenav.josm.common.cnf.BaseConfig;
-import net.exfidefortis.map.BoundingBox;
-import net.exfidefortis.map.Latitude;
-import net.exfidefortis.map.Longitude;
 
 
 /**
@@ -88,18 +85,5 @@ public final class Configurer extends BaseConfig {
 
     public String getLayerTooltipText() {
         return layerTooltipText;
-    }
-
-    /**
-     * Returns a bounding box corresponding to the JOSM world map.
-     *
-     * @return BoundingBox
-     */
-    public static BoundingBox getWorldBorder() {
-
-        return new BoundingBox.Builder().south(Latitude.forDegrees(Latitude.MINIMUM_DEGREE_VALUE))
-                .west(Longitude.forDegrees(Longitude.MINIMUM_DEGREE_VALUE))
-                .north(Latitude.forDegrees(Latitude.MAXIMUM_DEGREE_VALUE))
-                .east(Longitude.forDegrees(Longitude.MAXIMUM_DEGREE_VALUE)).build();
     }
 }

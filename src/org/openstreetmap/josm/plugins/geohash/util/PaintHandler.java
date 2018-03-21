@@ -19,6 +19,7 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.ImageryLayer;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.geohash.core.Geohash;
+import org.openstreetmap.josm.plugins.geohash.core.GeohashIdentifier;
 import com.telenav.josm.common.gui.PaintManager;
 import net.exfidefortis.map.Latitude;
 import net.exfidefortis.map.Longitude;
@@ -145,12 +146,20 @@ public class PaintHandler {
      */
     public Set<Geohash> setCodeVisibility(final Set<Geohash> geohashes, final Graphics2D graphics,
             final MapView mapView) {
+        // this is used to force one text width for all geohashes of same code length
+        final int[] codeLengths = new int[GeohashIdentifier.CUTT_OFF_DEPTH + 1];
         for (final Geohash geohash : geohashes) {
             final GeneralPath path = getGeohashPath(geohash, mapView);
-            final int textWidthRounded = (graphics.getFontMetrics().stringWidth(geohash.code()) / 10) * 10 + 10;
+            final int geohashLength = geohash.code().length();
+            int textWidth;
+            if (codeLengths[geohashLength] != 0) {
+                textWidth = codeLengths[geohashLength];
+            } else {
+                textWidth = graphics.getFontMetrics().stringWidth(geohash.code());
+                codeLengths[geohashLength] = textWidth;
+            }
             final int textHeight = graphics.getFontMetrics().getHeight();
-            if ((textWidthRounded <= (path.getBounds().getWidth() / 2 + TRANSLATE_X))
-                    && (textHeight < path.getBounds().height)) {
+            if ((textWidth < (path.getBounds().getWidth() / 2)) && (textHeight < path.getBounds().height)) {
                 geohash.setCodeVisibility(true);
             } else {
                 geohash.setCodeVisibility(false);

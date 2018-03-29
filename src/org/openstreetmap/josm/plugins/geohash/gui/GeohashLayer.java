@@ -41,7 +41,6 @@ public final class GeohashLayer extends Layer {
 
     private static GeohashLayer instance;
     private Set<Geohash> geohashes;
-    private Geohash selectedGeohash = null;
 
     private final PaintHandler paintHandler;
 
@@ -74,10 +73,7 @@ public final class GeohashLayer extends Layer {
             paintHandler.drawGeohash(graphics, mapView, geohash, false,
                     geohash.hasVisibleChildren(geohashes));
         }
-        if (selectedGeohash != null) {
-            paintHandler.drawGeohash(graphics, mapView, selectedGeohash, true,
-                    selectedGeohash.hasVisibleChildren(geohashes));
-        }
+
     }
 
     @Override
@@ -105,39 +101,20 @@ public final class GeohashLayer extends Layer {
 
     public void addGeohash(final Geohash geohash) {
         geohashes.add(geohash);
+        GeohashLayer.getInstance().invalidate();
         MainApplication.getMap().repaint();
     }
 
     public void addGeohashes(final Collection<Geohash> newGeohashes) {
         geohashes.addAll(newGeohashes);
+        GeohashLayer.getInstance().invalidate();
         MainApplication.getMap().repaint();
     }
 
     public void removeGeohashes(final Collection<Geohash> removeGeohashes) {
         geohashes.removeAll(removeGeohashes);
+        GeohashLayer.getInstance().invalidate();
         MainApplication.getMap().repaint();
-    }
-
-    public void setSelectedGeohash(final Geohash geohash) {
-        selectedGeohash = geohash;
-        if (this.isVisible()) {
-            paintHandler.drawGeohash((Graphics2D) MainApplication.getMap().mapView.getGraphics(),
-                    MainApplication.getMap().mapView,
-                    selectedGeohash, true, selectedGeohash.hasVisibleChildren(geohashes));
-        }
-    }
-
-    public Geohash getSelectedGeohash() {
-        return selectedGeohash;
-    }
-
-    public void clearSelectedGeohash() {
-        if (selectedGeohash != null && this.isVisible()) {
-            paintHandler.drawGeohash((Graphics2D) MainApplication.getMap().mapView.getGraphics(),
-                    MainApplication.getMap().mapView,
-                    selectedGeohash, false, selectedGeohash.hasVisibleChildren(geohashes));
-            selectedGeohash = null;
-        }
     }
 
     @Override
@@ -187,6 +164,7 @@ public final class GeohashLayer extends Layer {
             geohashes.clear();
             final Bounds worldBounds = Main.getProjection().getWorldBoundsLatLon();
             geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
+            GeohashLayer.getInstance().invalidate();
             MainApplication.getMap().repaint();
         }
     }

@@ -10,7 +10,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,7 +40,7 @@ import org.openstreetmap.josm.tools.ImageProvider;
  * @author laurad
  */
 public class GeohashPlugin extends Plugin
-implements LayerChangeListener, MouseListener, MouseMotionListener {
+implements LayerChangeListener, MouseListener {
 
     private static final int MIN_CODE_LENGTH = 1;
     private static final int MAX_ATTEMPTS = 3;
@@ -114,13 +113,11 @@ implements LayerChangeListener, MouseListener, MouseMotionListener {
     public void registerListeners() {
         MainApplication.getLayerManager().addLayerChangeListener(this);
         MainApplication.getMap().mapView.addMouseListener(this);
-        MainApplication.getMap().mapView.addMouseMotionListener(this);
     }
 
     public void unregisterListeners() {
         MainApplication.getLayerManager().removeLayerChangeListener(this);
         MainApplication.getMap().mapView.removeMouseListener(this);
-        MainApplication.getMap().mapView.removeMouseMotionListener(this);
     }
 
     @Override
@@ -172,7 +169,6 @@ implements LayerChangeListener, MouseListener, MouseMotionListener {
                     }).collect(Collectors.toSet());
                     layer.removeGeohashes(toBeDeleted);
                 }
-                layer.clearSelectedGeohash();
             }
         }
     }
@@ -209,29 +205,6 @@ implements LayerChangeListener, MouseListener, MouseMotionListener {
     @Override
     public void mouseExited(final MouseEvent e) {
         // not required
-    }
-
-    @Override
-    public void mouseDragged(final MouseEvent e) {
-        // not required
-    }
-
-    @Override
-    public void mouseMoved(final MouseEvent e) {
-        final LatLon mouseCoordinates = getMouseCoordinates();
-        final Optional<Geohash> selectedGeohash = getSelectedGeohash(mouseCoordinates);
-        if (selectedGeohash.isPresent()) {
-            if (layer.getSelectedGeohash() != null) {
-                if (!selectedGeohash.get().code().equals(layer.getSelectedGeohash().code())) {
-                    layer.clearSelectedGeohash();
-                    layer.setSelectedGeohash(selectedGeohash.get());
-                }
-            } else {
-                layer.setSelectedGeohash(selectedGeohash.get());
-            }
-        } else {
-            layer.clearSelectedGeohash();
-        }
     }
 
     /**

@@ -75,6 +75,7 @@
 				<attribute name="Plugin-Early" value="true" />
 				<attribute name="Plugin-Mainversion" value="10161" />
 				<attribute name="Plugin-Canloadatruntime" value="true"/>
+				<attribute name="Plugin-Link" value="https://wiki.openstreetmap.org/wiki/JOSM/Plugins/GeoHash" />
 			</manifest>
 		</jar>
 	</target>

@@ -34,7 +34,6 @@ class BitArray implements Iterable<Boolean> {
 
 
     private final List<Boolean> bits;
-    private transient String stringRepresentation;
 
     private BitArray(final List<Boolean> bits) {
         this.bits = new ArrayList<>(bits);
@@ -57,13 +56,10 @@ class BitArray implements Iterable<Boolean> {
     }
 
     public String asString() {
-        if (stringRepresentation == null) {
-            final StringBuilder builder = new StringBuilder();
-            for (final boolean bitIsSet : bits) {
-                builder.append(bitIsSet ? "1" : "0");
-            }
-            stringRepresentation = builder.toString();
+        final StringBuilder builder = new StringBuilder();
+        for (final boolean bitIsSet : bits) {
+            builder.append(bitIsSet ? "1" : "0");
         }
-        return stringRepresentation;
+        return builder.toString();
     }
 }

@@ -100,6 +100,12 @@ public class Angle implements Comparable<Angle> {
         return Angle.forDegrees(degrees / value);
     }
 
+    public boolean between(final Angle angle1, final Angle angle2) {
+        final double minimumDegrees = Math.min(angle1.asDegrees(), angle2.asDegrees());
+        final double maximumDegrees = Math.max(angle1.asDegrees(), angle2.asDegrees());
+        return asDegrees() > minimumDegrees && asDegrees() < maximumDegrees;
+    }
+
 
     @Override
     public int hashCode() {

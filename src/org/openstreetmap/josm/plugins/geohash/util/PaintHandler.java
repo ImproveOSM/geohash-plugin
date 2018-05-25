@@ -11,8 +11,9 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
@@ -144,10 +145,10 @@ public class PaintHandler {
      * @param mapView
      * @return
      */
-    public Set<Geohash> setCodeVisibility(final Set<Geohash> geohashes, final Graphics2D graphics,
+    public void setCodeVisibility(final Collection<Geohash> geohashes, final Graphics2D graphics,
             final MapView mapView) {
         // this is used to force one text width for all geohashes of same code length
-        final int[] codeLengths = new int[GeohashIdentifier.CUTT_OFF_DEPTH + 1];
+        final int[] codeLengths = new int[GeohashIdentifier.INSTANCE.cutOffDepth() + 1];
         for (final Geohash geohash : geohashes) {
             final GeneralPath path = getGeohashPath(geohash, mapView);
             final int geohashLength = geohash.code().length();
@@ -165,6 +166,5 @@ public class PaintHandler {
                 geohash.setCodeVisibility(false);
             }
         }
-        return geohashes;
     }
 }

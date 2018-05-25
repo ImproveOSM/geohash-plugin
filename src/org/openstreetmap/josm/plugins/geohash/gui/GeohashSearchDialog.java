@@ -9,8 +9,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Optional;
+import java.awt.event.KeyEvent;;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -99,20 +98,20 @@ public class GeohashSearchDialog extends ToggleDialog {
         public void actionPerformed(final ActionEvent e) {
             final String geohashCode = searchInput.getText();
 
-            final Optional<Geohash> searchedGeohash =
-                    GeohashLayer.getInstance().getGeohashes().stream().filter(g -> g.code().equals(geohashCode))
-                    .findFirst();
-            if (searchedGeohash.isPresent()) {
-                outputSearchFound(searchedGeohash.get());
-            } else {
+//            final Optional<Geohash> searchedGeohash =
+//                    GeohashLayer.getInstance().getGeohashes().stream().filter(g -> g.code().equals(geohashCode))
+//                    .findFirst();
+//            if (searchedGeohash.isPresent()) {
+//                outputSearchFound(searchedGeohash.get());
+//            } else {
                 try {
                     final Geohash findGeohash = new Geohash(geohashCode);
-                    GeohashLayer.getInstance().addGeohash(findGeohash);
+//                    GeohashLayer.getInstance().addGeohash(findGeohash);
                     outputSearchFound(findGeohash);
                 } catch (final IllegalArgumentException ex) {
                     searchOutput.setText(Configurer.getINSTANCE().getDialogLabelNotFound());
                 }
-            }
+//            }
         }
 
         /**

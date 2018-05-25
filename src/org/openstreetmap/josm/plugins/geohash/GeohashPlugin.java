@@ -8,11 +8,6 @@ package org.openstreetmap.josm.plugins.geohash;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import javax.swing.JMenuItem;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.coor.LatLon;
@@ -26,7 +21,6 @@ import org.openstreetmap.josm.gui.layer.LayerManager.LayerRemoveEvent;
 import org.openstreetmap.josm.gui.layer.TMSLayer;
 import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
-import org.openstreetmap.josm.plugins.geohash.core.Geohash;
 import org.openstreetmap.josm.plugins.geohash.gui.GeohashLayer;
 import org.openstreetmap.josm.plugins.geohash.gui.GeohashSearchDialog;
 import org.openstreetmap.josm.plugins.geohash.util.PreferenceManager;
@@ -39,12 +33,8 @@ import org.openstreetmap.josm.tools.ImageProvider;
  *
  * @author laurad
  */
-public class GeohashPlugin extends Plugin
-implements LayerChangeListener, MouseListener {
+public class GeohashPlugin extends Plugin implements LayerChangeListener {
 
-    private static final int MIN_CODE_LENGTH = 1;
-    private static final int MAX_ATTEMPTS = 3;
-    private static final int DOUBLE_CLICK = 2;
     private GeohashLayer layer;
     private JMenuItem layerMenu;
 
@@ -112,12 +102,10 @@ implements LayerChangeListener, MouseListener {
 
     public void registerListeners() {
         MainApplication.getLayerManager().addLayerChangeListener(this);
-        MainApplication.getMap().mapView.addMouseListener(this);
     }
 
     public void unregisterListeners() {
         MainApplication.getLayerManager().removeLayerChangeListener(this);
-        MainApplication.getMap().mapView.removeMouseListener(this);
     }
 
     @Override
@@ -134,77 +122,6 @@ implements LayerChangeListener, MouseListener {
         final Point mousePoint = MainApplication.getMap().mapView.getMousePosition();
         return mousePoint != null ? MainApplication.getMap().mapView.getLatLon(mousePoint.getX(), mousePoint.getY())
                 : null;
-    }
-
-    /**
-     * When double clicking a geohash, delete all equally sized geohashes from that parent. Does not delete the world
-     * geohash grid.
-     */
-    @Override
-    public void mouseClicked(final MouseEvent e) {
-        if (e.getClickCount() == DOUBLE_CLICK) {
-            int attempts = 0;
-            LatLon mouseCoordinates = getMouseCoordinates();
-            while (mouseCoordinates == null && attempts < MAX_ATTEMPTS) {
-                mouseCoordinates = getMouseCoordinates();
-                attempts++;
-            }
-            if (mouseCoordinates != null) {
-                final LatLon mousePosition = mouseCoordinates;
-                final Optional<Geohash> zoomedHash = getSelectedGeohash(mousePosition);
-                if (zoomedHash.isPresent() && zoomedHash.get().code().length() > MIN_CODE_LENGTH) {
-                    final String zoomedGeohash = zoomedHash.get().code();
-                    final Set<Geohash> toBeDeleted = layer.getGeohashes().stream().filter(geohash -> {
-                        return (geohash.code().length() >= zoomedGeohash.length())
-                                && geohash.code().startsWith(
-                                        zoomedGeohash.substring(0, zoomedGeohash.length() - MIN_CODE_LENGTH));
-                    }).collect(Collectors.toSet());
-                    layer.removeGeohashes(toBeDeleted);
-                }
-                if (zoomedHash.isPresent() && zoomedHash.get().code().length() == MIN_CODE_LENGTH) {
-                    final String zoomedGeohash = zoomedHash.get().code();
-                    final Set<Geohash> toBeDeleted = layer.getGeohashes().stream().filter(geohash -> {
-                        return geohash.code()
-                                .startsWith(zoomedGeohash.substring(0, zoomedGeohash.length() - MIN_CODE_LENGTH));
-                    }).collect(Collectors.toSet());
-                    layer.removeGeohashes(toBeDeleted);
-                }
-            }
-        }
-    }
-
-    /**
-     * Get the geohash over which the mouse is currently positioned
-     *
-     * @param mousePosition
-     * @return
-     */
-    private Optional<Geohash> getSelectedGeohash(final LatLon mousePosition) {
-        if (mousePosition != null) {
-            return layer.getGeohashes().stream().filter(geohash -> geohash.containsPoint(mousePosition))
-                    .max((g1, g2) -> Integer.compare(g1.code().length(), g2.code().length()));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public void mousePressed(final MouseEvent e) {
-        // not required
-    }
-
-    @Override
-    public void mouseReleased(final MouseEvent e) {
-        // not required
-    }
-
-    @Override
-    public void mouseEntered(final MouseEvent e) {
-        // not required
-    }
-
-    @Override
-    public void mouseExited(final MouseEvent e) {
-        // not required
     }
 
     /**

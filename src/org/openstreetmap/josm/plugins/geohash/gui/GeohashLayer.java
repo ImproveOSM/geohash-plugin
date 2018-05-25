@@ -40,14 +40,12 @@ public final class GeohashLayer extends Layer {
 
 
     private static GeohashLayer instance;
-    private Set<Geohash> geohashes;
 
     private final PaintHandler paintHandler;
 
     private GeohashLayer() {
         super(Configurer.getINSTANCE().getPluginName());
         paintHandler = new PaintHandler();
-        geohashes = new HashSet<>();
     }
 
     public static GeohashLayer getInstance() {
@@ -66,12 +64,11 @@ public final class GeohashLayer extends Layer {
         mapView.setDoubleBuffered(true);
         final BoundingBox mapViewBounds = Convert.convertBoundsToBoundingBox(MainApplication.getMap().mapView
                 .getProjection().getLatLonBoundsBox(MainApplication.getMap().mapView.getProjectionBounds()));
-        geohashes.addAll(GeohashIdentifier.get(mapViewBounds));
-        geohashes = paintHandler.setCodeVisibility(geohashes, graphics, mapView);
+        final Collection<Geohash> geohashes = GeohashIdentifier.INSTANCE.get(mapViewBounds);
+        paintHandler.setCodeVisibility(geohashes, graphics, mapView);
         setColors();
         for (final Geohash geohash : geohashes) {
-            paintHandler.drawGeohash(graphics, mapView, geohash, false,
-                    geohash.hasVisibleChildren(geohashes));
+            paintHandler.drawGeohash(graphics, mapView, geohash, false, false);
         }
 
     }
@@ -91,30 +88,8 @@ public final class GeohashLayer extends Layer {
         final LayerListDialog layerListDialog = LayerListDialog.getInstance();
         return new Action[] { layerListDialog.createActivateLayerAction(this),
                 layerListDialog.createShowHideLayerAction(), new GeohashLayerDeleteAction(layerListDialog.getModel()),
-                new ClearAction(),
+//                new ClearAction(),
                 SeparatorLayerAction.INSTANCE, new LayerListPopup.InfoAction(this) };
-    }
-
-    public Set<Geohash> getGeohashes() {
-        return geohashes;
-    }
-
-    public void addGeohash(final Geohash geohash) {
-        geohashes.add(geohash);
-        GeohashLayer.getInstance().invalidate();
-        MainApplication.getMap().repaint();
-    }
-
-    public void addGeohashes(final Collection<Geohash> newGeohashes) {
-        geohashes.addAll(newGeohashes);
-        GeohashLayer.getInstance().invalidate();
-        MainApplication.getMap().repaint();
-    }
-
-    public void removeGeohashes(final Collection<Geohash> removeGeohashes) {
-        geohashes.removeAll(removeGeohashes);
-        GeohashLayer.getInstance().invalidate();
-        MainApplication.getMap().repaint();
     }
 
     @Override
@@ -144,28 +119,28 @@ public final class GeohashLayer extends Layer {
         paintHandler.setColors();
     }
 
-    /**
-     * Layer menu has a clear geohashes option which is implemented by this class. This option removed all existing
-     * children leaving behind just the world geohash.
-     *
-     * @author laurad
-     * @version $Revision$
-     */
-    private class ClearAction extends AbstractAction{
-
-        private static final long serialVersionUID = -7430280025253271160L;
-
-        private ClearAction() {
-            putValue(NAME, tr("Clear geohashes"));
-        }
-
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            geohashes.clear();
-            final Bounds worldBounds = Main.getProjection().getWorldBoundsLatLon();
-            geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
-            GeohashLayer.getInstance().invalidate();
-            MainApplication.getMap().repaint();
-        }
-    }
+//    /**
+//     * Layer menu has a clear geohashes option which is implemented by this class. This option removed all existing
+//     * children leaving behind just the world geohash.
+//     *
+//     * @author laurad
+//     * @version $Revision$
+//     */
+//    private class ClearAction extends AbstractAction{
+//
+//        private static final long serialVersionUID = -7430280025253271160L;
+//
+//        private ClearAction() {
+//            putValue(NAME, tr("Clear geohashes"));
+//        }
+//
+//        @Override
+//        public void actionPerformed(final ActionEvent e) {
+//            geohashes.clear();
+//            final Bounds worldBounds = Main.getProjection().getWorldBoundsLatLon();
+//            geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
+//            GeohashLayer.getInstance().invalidate();
+//            MainApplication.getMap().repaint();
+//        }
+//    }
 }

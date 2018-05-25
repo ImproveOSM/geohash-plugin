@@ -235,6 +235,26 @@ public class BoundingBox {
                 && contains(other.southWest());
     }
 
+    public boolean intersects(final BoundingBox other) {
+        if (other == null) {
+            throw new IllegalArgumentException("received null bounding box");
+        }
+        return (intersectsLatitude(other) && other.intersectsLongitude(this))
+                || (intersectsLongitude(other) && other.intersectsLatitude(this));
+    }
+
+    private boolean intersectsLatitude(final BoundingBox other) {
+        return other.south().between(south, north) || other.north().between(south, north);
+    }
+
+    private boolean intersectsLongitude(final BoundingBox other) {
+        return other.west().between(west, east) || other.east().between(west, east);
+    }
+
+    public double areaAsSquareDegrees() {
+        return north.subtract(south).asDegrees() * east.subtract(west).asDegrees();
+    }
+
 
     @Override
     public int hashCode() {

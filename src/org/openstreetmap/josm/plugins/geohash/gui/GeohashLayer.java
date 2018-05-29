@@ -43,12 +43,12 @@ public final class GeohashLayer extends Layer {
 
         @Override
         public boolean isEnabled() {
-            return geohashIdentifier.coverageRatioIncreasePossible(mapViewBounds());
+            return geohashIdentifier.canIncreaseSideRatio(mapViewBounds());
         }
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            geohashIdentifier.increaseCoverageRatio(mapViewBounds());
+            geohashIdentifier.increaseSideRatio(mapViewBounds());
             GeohashLayer.getInstance().invalidate();
             MainApplication.getMap().repaint();
         }
@@ -62,12 +62,12 @@ public final class GeohashLayer extends Layer {
 
         @Override
         public boolean isEnabled() {
-            return geohashIdentifier.coverageRatioDecreasePossible(mapViewBounds());
+            return geohashIdentifier.canDecreaseSideRatio(mapViewBounds());
         }
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            geohashIdentifier.decreaseCoverageRatio(mapViewBounds());
+            geohashIdentifier.decreaseSideRatio(mapViewBounds());
             GeohashLayer.getInstance().invalidate();
             MainApplication.getMap().repaint();
         }
@@ -82,7 +82,7 @@ public final class GeohashLayer extends Layer {
     private GeohashLayer() {
         super(Configurer.getINSTANCE().getPluginName());
         paintHandler = new PaintHandler();
-        geohashIdentifier = new GeohashIdentifier(0.3, 0.1);
+        geohashIdentifier = new GeohashIdentifier(0.5, 0.1);
     }
 
     public static GeohashLayer getInstance() {

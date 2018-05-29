@@ -23,86 +23,79 @@ public final class GeohashIdentifier {
     public static final int CUTOFF_DEPTH = 10;
 
 
-    private double coverageRatio;
-    private double coverageRatioLeeway;
+    private double sideRatio;
+    private final double sideRatioLeeway;
 
-    public GeohashIdentifier(final double coverageRatio, final double coverageRatioLeeway) {
-        this.coverageRatio = coverageRatio;
-        this.coverageRatioLeeway = coverageRatioLeeway;
+    public GeohashIdentifier(final double sideRatio, final double sideRatioLeeway) {
+        this.sideRatio = sideRatio;
+        this.sideRatioLeeway = sideRatioLeeway;
     }
 
-    public boolean coverageRatioIncreasePossible(final BoundingBox bounds) {
-        return !Objects.equals(computeIncreasedCoverageRatio(bounds), coverageRatio);
+    public boolean canIncreaseSideRatio(final BoundingBox bounds) {
+        return !Objects.equals(computeIncreasedSideRatio(bounds), sideRatio);
     }
 
-    public void increaseCoverageRatio(final BoundingBox bounds) {
-        final double newCoverageRatio = computeIncreasedCoverageRatio(bounds);
-        if (!Objects.equals(newCoverageRatio, coverageRatio)) {
-            coverageRatio = newCoverageRatio;
+    public void increaseSideRatio(final BoundingBox bounds) {
+        final double newSideRatio = computeIncreasedSideRatio(bounds);
+        if (!Objects.equals(newSideRatio, sideRatio)) {
+            sideRatio = newSideRatio;
         }
     }
 
-    private double computeIncreasedCoverageRatio(final BoundingBox bounds) {
+    private double computeIncreasedSideRatio(final BoundingBox bounds) {
         final Collection<Geohash> geohashes = get(bounds);
         final Collection<Geohash> parents = geohashes.stream().map(Geohash::parent).collect(Collectors.toSet());
         final Geohash oneParent = parents.stream().findAny().get();
-        double newCoverageRatio = coverageRatio;
+        double newSideRatio = sideRatio;
         if (oneParent != Geohash.WORLD) {
-            final double geohashArea = oneParent.bounds().areaAsSquareDegrees();
-            final double boundsArea = bounds.areaAsSquareDegrees();
-            final double proposedMaximumCoveragePercent = geohashArea / boundsArea;
-            if (proposedMaximumCoveragePercent < 1) {
-                newCoverageRatio = proposedMaximumCoveragePercent;
+            final double proposedSideRatio = computeSideRatio(Collections.singleton(oneParent), bounds);
+            if (proposedSideRatio < 1) {
+                newSideRatio = proposedSideRatio;
             }
         }
-        return newCoverageRatio;
+        return newSideRatio;
     }
 
-    public boolean coverageRatioDecreasePossible(final BoundingBox bounds) {
-        return !Objects.equals(computeDecreasedCoverageRatio(bounds), coverageRatio);
+    public boolean canDecreaseSideRatio(final BoundingBox bounds) {
+        return !Objects.equals(computeDecreasedSideRatio(bounds), sideRatio);
     }
 
-    public void decreaseCoverageRatio(final BoundingBox bounds) {
-        final double newCoverageRatio = computeDecreasedCoverageRatio(bounds);
-        if (!Objects.equals(newCoverageRatio, coverageRatio)) {
-            coverageRatio = newCoverageRatio;
+    public void decreaseSideRatio(final BoundingBox bounds) {
+        final double newSideRatio = computeDecreasedSideRatio(bounds);
+        if (!Objects.equals(newSideRatio, sideRatio)) {
+            sideRatio = newSideRatio;
         }
     }
 
-    private double computeDecreasedCoverageRatio(final BoundingBox bounds) {
+    private double computeDecreasedSideRatio(final BoundingBox bounds) {
         Collection<Geohash> geohashes = get(bounds);
         final Collection<Geohash> children = relevantChildren(geohashes, bounds);
-        double newCoverageRatio = coverageRatio;
+        double newSideRatio = sideRatio;
         if (children.size() < 400 && !atCutOffDepth(children)) {
-            final Geohash oneChild = children.stream().findAny().get();
-            final double geohashArea = oneChild.bounds().areaAsSquareDegrees();
-            final double boundsArea = bounds.areaAsSquareDegrees();
-            newCoverageRatio = geohashArea / boundsArea;
+            newSideRatio = computeSideRatio(children, bounds);
         }
-        return newCoverageRatio;
+        return newSideRatio;
     }
 
     public Collection<Geohash> get(final BoundingBox bounds) {
-        System.out.println("coverageRatio is " + coverageRatio);
         Collection<Geohash> geohashes = Collections.singleton(Geohash.WORLD);
-        while (!acceptableCoverage(geohashes, bounds)) {
+        while (!acceptableSideRatio(geohashes, bounds)) {
             geohashes = relevantChildren(geohashes, bounds);
         }
-        System.out.println("actual coverage ratio is " + coverageRatio(geohashes, bounds));
         return geohashes;
     }
 
-    private boolean acceptableCoverage(final Collection<Geohash> geohashes, final BoundingBox bounds) {
-        final boolean acceptableCoverage;
+    private boolean acceptableSideRatio(final Collection<Geohash> geohashes, final BoundingBox bounds) {
+        final boolean acceptableSideRatio;
         if (atCutOffDepth(geohashes)) {
-            acceptableCoverage = true;
+            acceptableSideRatio = true;
         } else if (geohashes.isEmpty() || singleEncompassingGeohash(geohashes, bounds)) {
-            acceptableCoverage = false;
+            acceptableSideRatio = false;
         } else {
-            final double acceptableError = coverageRatio * coverageRatioLeeway;
-            acceptableCoverage = coverageRatio(geohashes, bounds) <= coverageRatio + acceptableError;
+            final double acceptableError = sideRatio * sideRatioLeeway;
+            acceptableSideRatio = computeSideRatio(geohashes, bounds) <= sideRatio + acceptableError;
         }
-        return acceptableCoverage;
+        return acceptableSideRatio;
     }
 
     private boolean atCutOffDepth(final Collection<Geohash> geohashes) {
@@ -113,9 +106,9 @@ public final class GeohashIdentifier {
         return geohashes.size() == 1 && geohashes.stream().findAny().get().bounds().contains(bounds);
     }
 
-    private double coverageRatio(final Collection<Geohash> geohashes, final BoundingBox bounds) {
-        final double geohashArea = geohashes.stream().findAny().get().bounds().areaAsSquareDegrees();
-        return geohashArea / bounds.areaAsSquareDegrees();
+    private double computeSideRatio(final Collection<Geohash> geohashes, final BoundingBox bounds) {
+        final double geohashSide = geohashes.stream().findAny().get().longSideAsDegrees();
+        return geohashSide / bounds.widthAsDegrees();
     }
 
     private Collection<Geohash> relevantChildren(final Collection<Geohash> geohashes, final BoundingBox bounds) {

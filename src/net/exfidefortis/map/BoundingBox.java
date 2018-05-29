@@ -255,8 +255,12 @@ public class BoundingBox {
         return contains(other) || intersects(other) || other.contains(this);
     }
 
-    public double areaAsSquareDegrees() {
-        return north.subtract(south).asDegrees() * east.subtract(west).asDegrees();
+    public double widthAsDegrees() {
+        return east.subtract(west).asDegrees();
+    }
+
+    public double heightAsDegrees() {
+        return north.subtract(south).asDegrees();
     }
 
 

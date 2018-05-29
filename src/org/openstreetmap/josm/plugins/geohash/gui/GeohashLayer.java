@@ -35,29 +35,39 @@ import java.util.Collection;
  */
 public final class GeohashLayer extends Layer {
 
-    private class IncreaseCoverageAction extends AbstractAction{
+    private class IncreaseCoverageAction extends AbstractAction {
 
         private IncreaseCoverageAction() {
-            putValue(NAME, I18n.tr("Increase coverage"));
+            putValue(NAME, I18n.tr("Display larger geohashes"));
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return geohashIdentifier.coverageRatioIncreasePossible(mapViewBounds());
         }
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            geohashIdentifier.increaseCoveragePercent(mapViewBounds());
+            geohashIdentifier.increaseCoverageRatio(mapViewBounds());
             GeohashLayer.getInstance().invalidate();
             MainApplication.getMap().repaint();
         }
     }
 
-    private class DecreaseCoverageAction extends AbstractAction{
+    private class DecreaseCoverageAction extends AbstractAction {
 
         private DecreaseCoverageAction() {
-            putValue(NAME, I18n.tr("Decrease coverage"));
+            putValue(NAME, I18n.tr("Display smaller geohashes"));
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return geohashIdentifier.coverageRatioDecreasePossible(mapViewBounds());
         }
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            geohashIdentifier.decreaseCoveragePercent(mapViewBounds());
+            geohashIdentifier.decreaseCoverageRatio(mapViewBounds());
             GeohashLayer.getInstance().invalidate();
             MainApplication.getMap().repaint();
         }

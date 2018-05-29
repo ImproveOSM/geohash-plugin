@@ -7,6 +7,7 @@ package org.openstreetmap.josm.plugins.geohash.core;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import net.exfidefortis.map.BoundingBox;
@@ -30,29 +31,55 @@ public final class GeohashIdentifier {
         this.coverageRatioLeeway = coverageRatioLeeway;
     }
 
-    public void increaseCoveragePercent(final BoundingBox bounds) {
+    public boolean coverageRatioIncreasePossible(final BoundingBox bounds) {
+        return !Objects.equals(computeIncreasedCoverageRatio(bounds), coverageRatio);
+    }
+
+    public void increaseCoverageRatio(final BoundingBox bounds) {
+        final double newCoverageRatio = computeIncreasedCoverageRatio(bounds);
+        if (!Objects.equals(newCoverageRatio, coverageRatio)) {
+            coverageRatio = newCoverageRatio;
+        }
+    }
+
+    private double computeIncreasedCoverageRatio(final BoundingBox bounds) {
         final Collection<Geohash> geohashes = get(bounds);
         final Collection<Geohash> parents = geohashes.stream().map(Geohash::parent).collect(Collectors.toSet());
         final Geohash oneParent = parents.stream().findAny().get();
+        double newCoverageRatio = coverageRatio;
         if (oneParent != Geohash.WORLD) {
             final double geohashArea = oneParent.bounds().areaAsSquareDegrees();
             final double boundsArea = bounds.areaAsSquareDegrees();
             final double proposedMaximumCoveragePercent = geohashArea / boundsArea;
             if (proposedMaximumCoveragePercent < 1) {
-                coverageRatio = proposedMaximumCoveragePercent;
+                newCoverageRatio = proposedMaximumCoveragePercent;
             }
+        }
+        return newCoverageRatio;
+    }
+
+    public boolean coverageRatioDecreasePossible(final BoundingBox bounds) {
+        return !Objects.equals(computeDecreasedCoverageRatio(bounds), coverageRatio);
+    }
+
+    public void decreaseCoverageRatio(final BoundingBox bounds) {
+        final double newCoverageRatio = computeDecreasedCoverageRatio(bounds);
+        if (!Objects.equals(newCoverageRatio, coverageRatio)) {
+            coverageRatio = newCoverageRatio;
         }
     }
 
-    public void decreaseCoveragePercent(final BoundingBox bounds) {
+    private double computeDecreasedCoverageRatio(final BoundingBox bounds) {
         Collection<Geohash> geohashes = get(bounds);
         final Collection<Geohash> children = relevantChildren(geohashes, bounds);
+        double newCoverageRatio = coverageRatio;
         if (children.size() < 400 && !atCutOffDepth(children)) {
             final Geohash oneChild = children.stream().findAny().get();
             final double geohashArea = oneChild.bounds().areaAsSquareDegrees();
             final double boundsArea = bounds.areaAsSquareDegrees();
-            coverageRatio = geohashArea / boundsArea;
+            newCoverageRatio = geohashArea / boundsArea;
         }
+        return newCoverageRatio;
     }
 
     public Collection<Geohash> get(final BoundingBox bounds) {

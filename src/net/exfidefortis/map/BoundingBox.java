@@ -251,6 +251,10 @@ public class BoundingBox {
         return other.west().between(west, east) || other.east().between(west, east);
     }
 
+    public boolean sharesAreaWith(final BoundingBox other) {
+        return contains(other) || intersects(other) || other.contains(this);
+    }
+
     public double areaAsSquareDegrees() {
         return north.subtract(south).asDegrees() * east.subtract(west).asDegrees();
     }

@@ -6,8 +6,7 @@
 package org.openstreetmap.josm.plugins.geohash.core;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import net.exfidefortis.map.BoundingBox;
@@ -20,67 +19,81 @@ import net.exfidefortis.map.BoundingBox;
  */
 public final class GeohashIdentifier {
 
-    public static final GeohashIdentifier INSTANCE = new GeohashIdentifier(10, 0.3f);
+    public static final int CUTOFF_DEPTH = 10;
 
-    private final int cutOffDepth;
-    private float maximumCoveragePercent;
 
-    private GeohashIdentifier(final int cutOffDepth, final float maximumCoveragePercent) {
-        this.cutOffDepth = cutOffDepth;
-        this.maximumCoveragePercent = maximumCoveragePercent;
+    private double coverageRatio;
+    private double coverageRatioLeeway;
+
+    public GeohashIdentifier(final double coverageRatio, final double coverageRatioLeeway) {
+        this.coverageRatio = coverageRatio;
+        this.coverageRatioLeeway = coverageRatioLeeway;
     }
 
-    public int cutOffDepth() {
-        return cutOffDepth;
+    public void increaseCoveragePercent(final BoundingBox bounds) {
+        final Collection<Geohash> geohashes = get(bounds);
+        final Collection<Geohash> parents = geohashes.stream().map(Geohash::parent).collect(Collectors.toSet());
+        final Geohash oneParent = parents.stream().findAny().get();
+        if (oneParent != Geohash.WORLD) {
+            final double geohashArea = oneParent.bounds().areaAsSquareDegrees();
+            final double boundsArea = bounds.areaAsSquareDegrees();
+            final double proposedMaximumCoveragePercent = geohashArea / boundsArea;
+            if (proposedMaximumCoveragePercent < 1) {
+                coverageRatio = proposedMaximumCoveragePercent;
+            }
+        }
+    }
+
+    public void decreaseCoveragePercent(final BoundingBox bounds) {
+        Collection<Geohash> geohashes = get(bounds);
+        final Collection<Geohash> children = relevantChildren(geohashes, bounds);
+        if (children.size() < 400 && !atCutOffDepth(children)) {
+            final Geohash oneChild = children.stream().findAny().get();
+            final double geohashArea = oneChild.bounds().areaAsSquareDegrees();
+            final double boundsArea = bounds.areaAsSquareDegrees();
+            coverageRatio = geohashArea / boundsArea;
+        }
     }
 
     public Collection<Geohash> get(final BoundingBox bounds) {
-        Collection<Geohash> finalGeohashes = new HashSet<>();
-        Geohash currentParent = Geohash.WORLD;
-        int depth = 0;
-        while (finalGeohashes.isEmpty() && depth < cutOffDepth) {
-            final Collection<Geohash> candidateGeohashes = currentParent.children();
-            final Iterator<Geohash> candidateGeohashesIterator = currentParent.children().iterator();
-            Geohash nextCandidate = null;
-            while (nextCandidate == null && candidateGeohashesIterator.hasNext()) {
-                final Geohash candidate = candidateGeohashesIterator.next();
-                if (candidate.bounds().contains(bounds)) {
-                    nextCandidate = candidate;
-                }
-            }
-            if (nextCandidate == null) {
-                final Collection<Geohash> intersectingGeohashes = candidateGeohashes.stream()
-                        .filter(geohash -> bounds.intersects(geohash.bounds()) || bounds.contains(geohash.bounds()))
-                        .collect(Collectors.toSet());
-                finalGeohashes.addAll(intersectingGeohashes);
-            } else {
-                currentParent = nextCandidate;
-            }
-            depth++;
+        System.out.println("coverageRatio is " + coverageRatio);
+        Collection<Geohash> geohashes = Collections.singleton(Geohash.WORLD);
+        while (!acceptableCoverage(geohashes, bounds)) {
+            geohashes = relevantChildren(geohashes, bounds);
         }
-        return refine(finalGeohashes, bounds);
+        System.out.println("actual coverage ratio is " + coverageRatio(geohashes, bounds));
+        return geohashes;
     }
 
-    private Collection<Geohash> refine(final Collection<Geohash> geohashes, final BoundingBox bounds) {
-        Collection<Geohash> refinedGeohashes = geohashes;
-        while (!acceptedCoverage(refinedGeohashes, bounds) && !atCutOffDepth(refinedGeohashes)) {
-            refinedGeohashes = replaceWithChildren(refinedGeohashes, bounds);
+    private boolean acceptableCoverage(final Collection<Geohash> geohashes, final BoundingBox bounds) {
+        final boolean acceptableCoverage;
+        if (atCutOffDepth(geohashes)) {
+            acceptableCoverage = true;
+        } else if (geohashes.isEmpty() || singleEncompassingGeohash(geohashes, bounds)) {
+            acceptableCoverage = false;
+        } else {
+            final double acceptableError = coverageRatio * coverageRatioLeeway;
+            acceptableCoverage = coverageRatio(geohashes, bounds) <= coverageRatio + acceptableError;
         }
-        return refinedGeohashes;
+        return acceptableCoverage;
     }
 
     private boolean atCutOffDepth(final Collection<Geohash> geohashes) {
-        return geohashes.stream().anyMatch(geohash -> geohash.code().length() == cutOffDepth);
+        return geohashes.stream().anyMatch(geohash -> geohash.code().length() == CUTOFF_DEPTH);
     }
 
-    private boolean acceptedCoverage(final Collection<Geohash> geohashes, final BoundingBox bounds) {
+    private boolean singleEncompassingGeohash(final Collection<Geohash> geohashes, final BoundingBox bounds) {
+        return geohashes.size() == 1 && geohashes.stream().findAny().get().bounds().contains(bounds);
+    }
+
+    private double coverageRatio(final Collection<Geohash> geohashes, final BoundingBox bounds) {
         final double geohashArea = geohashes.stream().findAny().get().bounds().areaAsSquareDegrees();
-        return geohashArea / bounds.areaAsSquareDegrees() <= maximumCoveragePercent;
+        return geohashArea / bounds.areaAsSquareDegrees();
     }
 
-    private Collection<Geohash> replaceWithChildren(final Collection<Geohash> geohashes, final BoundingBox bounds) {
+    private Collection<Geohash> relevantChildren(final Collection<Geohash> geohashes, final BoundingBox bounds) {
         return geohashes.stream().flatMap(geohash -> geohash.children().stream())
-                .filter(geohash -> bounds.intersects(geohash.bounds()) || bounds.contains(geohash.bounds()))
+                .filter(geohash -> geohash.bounds().sharesAreaWith(bounds))
                 .collect(Collectors.toSet());
     }
 }

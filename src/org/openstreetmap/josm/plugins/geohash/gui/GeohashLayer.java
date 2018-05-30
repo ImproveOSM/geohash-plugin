@@ -35,46 +35,28 @@ import java.util.Collection;
  */
 public final class GeohashLayer extends Layer {
 
-    private class IncreaseCoverageAction extends AbstractAction {
-
-        private IncreaseCoverageAction() {
-            putValue(NAME, I18n.tr("Display larger geohashes"));
-        }
-
-        @Override
-        public boolean isEnabled() {
-            return geohashIdentifier.canIncreaseSideRatio(mapViewBounds());
-        }
-
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            geohashIdentifier.increaseSideRatio(mapViewBounds());
-            GeohashLayer.getInstance().invalidate();
-            MainApplication.getMap().repaint();
-        }
-    }
-
-    private class DecreaseCoverageAction extends AbstractAction {
-
-        private DecreaseCoverageAction() {
-            putValue(NAME, I18n.tr("Display smaller geohashes"));
-        }
-
-        @Override
-        public boolean isEnabled() {
-            return geohashIdentifier.canDecreaseSideRatio(mapViewBounds());
-        }
-
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            geohashIdentifier.decreaseSideRatio(mapViewBounds());
-            GeohashLayer.getInstance().invalidate();
-            MainApplication.getMap().repaint();
-        }
-    }
-
     private static GeohashLayer instance;
 
+
+    private AbstractAction increaseCoverageAction = new AbstractAction(I18n.tr("Display larger geohashes")) {
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            geohashIdentifier.increaseSideRatio();
+            GeohashLayer.getInstance().invalidate();
+            MainApplication.getMap().repaint();
+        }
+    };
+
+    private AbstractAction decreaseCoverageAction = new AbstractAction(I18n.tr("Display smaller geohashes")) {
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            geohashIdentifier.decreaseSideRatio();
+            GeohashLayer.getInstance().invalidate();
+            MainApplication.getMap().repaint();
+        }
+    };
 
     private final PaintHandler paintHandler;
     private final GeohashIdentifier geohashIdentifier;
@@ -82,7 +64,7 @@ public final class GeohashLayer extends Layer {
     private GeohashLayer() {
         super(Configurer.getINSTANCE().getPluginName());
         paintHandler = new PaintHandler();
-        geohashIdentifier = new GeohashIdentifier(0.5);
+        geohashIdentifier = new GeohashIdentifier();
     }
 
     public static GeohashLayer getInstance() {
@@ -125,10 +107,14 @@ public final class GeohashLayer extends Layer {
 
     @Override
     public Action[] getMenuEntries() {
+        increaseCoverageAction.setEnabled(geohashIdentifier.canIncreaseSideRatio()
+                && geohashIdentifier.wouldNoticeSideRatioIncrease(mapViewBounds()));
+        decreaseCoverageAction.setEnabled(geohashIdentifier.canDecreaseSideRatio()
+                && geohashIdentifier.wouldNoticeSideRatioDecrease(mapViewBounds()));
         final LayerListDialog layerListDialog = LayerListDialog.getInstance();
         return new Action[] { layerListDialog.createActivateLayerAction(this),
                 layerListDialog.createShowHideLayerAction(), new GeohashLayerDeleteAction(layerListDialog.getModel()),
-                new IncreaseCoverageAction(), new DecreaseCoverageAction(),
+                increaseCoverageAction, decreaseCoverageAction,
                 SeparatorLayerAction.INSTANCE, new LayerListPopup.InfoAction(this) };
     }
 

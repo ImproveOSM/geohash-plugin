@@ -82,7 +82,7 @@ public final class GeohashLayer extends Layer {
     private GeohashLayer() {
         super(Configurer.getINSTANCE().getPluginName());
         paintHandler = new PaintHandler();
-        geohashIdentifier = new GeohashIdentifier(0.5, 0.1);
+        geohashIdentifier = new GeohashIdentifier(0.5);
     }
 
     public static GeohashLayer getInstance() {

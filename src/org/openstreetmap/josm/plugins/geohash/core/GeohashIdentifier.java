@@ -22,13 +22,15 @@ public final class GeohashIdentifier {
 
     public static final int CUTOFF_DEPTH = 10;
 
+    private static final double MAXIMUM_SIDE_RATIO = 1;
+    private static final double MINIMUM_SIDE_RATIO = 0.2;
+    private static final double SIDE_RATIO_LEEWAY = 0.1;
+
 
     private double sideRatio;
-    private final double sideRatioLeeway;
 
-    public GeohashIdentifier(final double sideRatio, final double sideRatioLeeway) {
+    public GeohashIdentifier(final double sideRatio) {
         this.sideRatio = sideRatio;
-        this.sideRatioLeeway = sideRatioLeeway;
     }
 
     public boolean canIncreaseSideRatio(final BoundingBox bounds) {
@@ -49,7 +51,7 @@ public final class GeohashIdentifier {
         double newSideRatio = sideRatio;
         if (oneParent != Geohash.WORLD) {
             final double proposedSideRatio = computeSideRatio(Collections.singleton(oneParent), bounds);
-            if (proposedSideRatio < 1) {
+            if (proposedSideRatio < MAXIMUM_SIDE_RATIO) {
                 newSideRatio = proposedSideRatio;
             }
         }
@@ -71,8 +73,11 @@ public final class GeohashIdentifier {
         Collection<Geohash> geohashes = get(bounds);
         final Collection<Geohash> children = relevantChildren(geohashes, bounds);
         double newSideRatio = sideRatio;
-        if (children.size() < 400 && !atCutOffDepth(children)) {
-            newSideRatio = computeSideRatio(children, bounds);
+        if (!atCutOffDepth(children)) {
+            final double proposedSideRatio = computeSideRatio(children, bounds);
+            if (proposedSideRatio > MINIMUM_SIDE_RATIO) {
+                newSideRatio = proposedSideRatio;
+            }
         }
         return newSideRatio;
     }
@@ -92,7 +97,7 @@ public final class GeohashIdentifier {
         } else if (geohashes.isEmpty() || singleEncompassingGeohash(geohashes, bounds)) {
             acceptableSideRatio = false;
         } else {
-            final double acceptableError = sideRatio * sideRatioLeeway;
+            final double acceptableError = sideRatio * SIDE_RATIO_LEEWAY;
             acceptableSideRatio = computeSideRatio(geohashes, bounds) <= sideRatio + acceptableError;
         }
         return acceptableSideRatio;

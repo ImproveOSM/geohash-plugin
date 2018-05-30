@@ -5,12 +5,7 @@
  */
 package org.openstreetmap.josm.plugins.geohash;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import javax.swing.JMenuItem;
 import org.openstreetmap.josm.actions.JosmAction;
-import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MainMenu;
 import org.openstreetmap.josm.gui.MapFrame;
@@ -26,6 +21,10 @@ import org.openstreetmap.josm.plugins.geohash.gui.GeohashSearchDialog;
 import org.openstreetmap.josm.plugins.geohash.util.PreferenceManager;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.ImageProvider;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 
 
 /**
@@ -111,17 +110,6 @@ public class GeohashPlugin extends Plugin implements LayerChangeListener {
     @Override
     public void layerOrderChanged(final LayerOrderChangeEvent e) {
         // not required
-    }
-
-    /**
-     * Used to return the coordinates of the mouse position on screen in JOSM LatLon format.
-     *
-     * @return LatLon
-     */
-    private LatLon getMouseCoordinates() {
-        final Point mousePoint = MainApplication.getMap().mapView.getMousePosition();
-        return mousePoint != null ? MainApplication.getMap().mapView.getLatLon(mousePoint.getX(), mousePoint.getY())
-                : null;
     }
 
     /**

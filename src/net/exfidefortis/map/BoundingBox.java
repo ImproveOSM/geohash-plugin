@@ -255,23 +255,10 @@ public class BoundingBox {
         return contains(other) || intersects(other) || other.contains(this);
     }
 
-    public double widthAsDegrees() {
-        return east.subtract(west).asDegrees();
-    }
-
-    public double heightAsDegrees() {
-        return north.subtract(south).asDegrees();
-    }
-
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 37 * hash + Objects.hashCode(this.north);
-        hash = 37 * hash + Objects.hashCode(this.south);
-        hash = 37 * hash + Objects.hashCode(this.east);
-        hash = 37 * hash + Objects.hashCode(this.west);
-        return hash;
+        return Objects.hash(north, south, east, west);
     }
 
     @Override
@@ -283,16 +270,8 @@ public class BoundingBox {
             return false;
         }
         final BoundingBox other = (BoundingBox) obj;
-        if (!Objects.equals(this.north, other.north)) {
-            return false;
-        }
-        if (!Objects.equals(this.south, other.south)) {
-            return false;
-        }
-        if (!Objects.equals(this.east, other.east)) {
-            return false;
-        }
-        return Objects.equals(this.west, other.west);
+        return Objects.equals(north, other.north) && Objects.equals(south, other.south)
+                && Objects.equals(east, other.east) && Objects.equals(west, other.west);
     }
 
     @Override

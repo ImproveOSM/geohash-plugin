@@ -59,10 +59,6 @@ public class Geohash {
         return bounds;
     }
 
-    public double longSideAsDegrees() {
-        return Math.max(bounds().widthAsDegrees(), bounds().heightAsDegrees());
-    }
-
     public Geohash parent() {
         return this == WORLD ? null : new Geohash(code.substring(0, code.length() - 1));
     }

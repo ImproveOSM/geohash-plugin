@@ -107,8 +107,12 @@ public final class GeohashIdentifier {
     }
 
     private double computeSideRatio(final Collection<Geohash> geohashes, final BoundingBox bounds) {
-        final double geohashSide = geohashes.stream().findAny().get().longSideAsDegrees();
-        return geohashSide / bounds.widthAsDegrees();
+        final BoundingBox geohashBounds = geohashes.stream().findAny().get().bounds();
+        final double geohashWidth = geohashBounds.east().subtract(geohashBounds.west()).asDegrees();
+        final double geohashHeight = geohashBounds.north().subtract(geohashBounds.south()).asDegrees();
+        final double geohashSide = Math.max(geohashWidth, geohashHeight);
+        final double boundsSide = bounds.east().subtract(bounds.west()).asDegrees();
+        return geohashSide / boundsSide;
     }
 
     private Collection<Geohash> relevantChildren(final Collection<Geohash> geohashes, final BoundingBox bounds) {

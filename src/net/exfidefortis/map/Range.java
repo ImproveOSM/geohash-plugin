@@ -36,10 +36,7 @@ public class Range<T> {
             return false;
         }
         final Range<?> other = (Range<?>) obj;
-        if (!Objects.equals(this.minimum, other.minimum)) {
-            return false;
-        }
-        return Objects.equals(this.maximum, other.maximum);
+        return Objects.equals(minimum, other.minimum) && Objects.equals(maximum, other.maximum);
     }
 
     @Override

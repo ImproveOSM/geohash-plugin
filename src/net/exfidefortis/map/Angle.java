@@ -10,6 +10,9 @@
 package net.exfidefortis.map;
 
 
+import java.util.Objects;
+
+
 /**
  * A geometric angle represented as an object in order to support
  * multiple representations (as degrees, radians, etc.) while abstracting
@@ -108,14 +111,6 @@ public class Angle implements Comparable<Angle> {
 
 
     @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 89 * hash + (int) (Double.doubleToLongBits(this.degrees)
-                ^ (Double.doubleToLongBits(this.degrees) >>> 32));
-        return hash;
-    }
-
-    @Override
     public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
@@ -124,8 +119,12 @@ public class Angle implements Comparable<Angle> {
             return false;
         }
         final Angle other = (Angle) obj;
-        return Double.doubleToLongBits(this.degrees) ==
-                Double.doubleToLongBits(other.degrees);
+        return Double.doubleToLongBits(this.degrees) == Double.doubleToLongBits(other.degrees);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(degrees);
     }
 
     @Override

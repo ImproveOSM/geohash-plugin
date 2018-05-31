@@ -16,14 +16,10 @@ import java.util.HashMap;
  */
 class Alphabet {
 
-    private static final int BITS_PER_CHARACTER = 5;
-
-
     public static final Alphabet INSTANCE = new Alphabet();
 
 
-    private final char[] characters = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'b', 'c', 'd', 'e',
-            'f', 'g',
+    private final char[] characters = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'b', 'c', 'd', 'e', 'f', 'g',
             'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
     private final HashMap<Character, Integer> indexForCharacter = new HashMap<>();
@@ -36,7 +32,7 @@ class Alphabet {
     }
 
     public int bitsPerCharacter() {
-        return BITS_PER_CHARACTER;
+        return 5;
     }
 
     public Collection<Character> characters() {

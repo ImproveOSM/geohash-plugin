@@ -5,17 +5,9 @@
  */
 package org.openstreetmap.josm.plugins.geohash.gui;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import org.openstreetmap.josm.Main;
+import net.exfidefortis.map.BoundingBox;
 import org.openstreetmap.josm.data.Bounds;
+import org.openstreetmap.josm.data.ProjectionBounds;
 import org.openstreetmap.josm.data.osm.visitor.BoundingXYVisitor;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
@@ -27,8 +19,13 @@ import org.openstreetmap.josm.plugins.geohash.core.GeohashIdentifier;
 import org.openstreetmap.josm.plugins.geohash.util.Convert;
 import org.openstreetmap.josm.plugins.geohash.util.PaintHandler;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
+import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
-import net.exfidefortis.map.BoundingBox;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.Collection;
 
 
 /**
@@ -38,16 +35,36 @@ import net.exfidefortis.map.BoundingBox;
  */
 public final class GeohashLayer extends Layer {
 
-
     private static GeohashLayer instance;
-    private Set<Geohash> geohashes;
+
+
+    private AbstractAction increaseCoverageAction = new AbstractAction(I18n.tr("Display larger geohashes")) {
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            geohashIdentifier.increaseSideRatio();
+            GeohashLayer.getInstance().invalidate();
+            MainApplication.getMap().repaint();
+        }
+    };
+
+    private AbstractAction decreaseCoverageAction = new AbstractAction(I18n.tr("Display smaller geohashes")) {
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            geohashIdentifier.decreaseSideRatio();
+            GeohashLayer.getInstance().invalidate();
+            MainApplication.getMap().repaint();
+        }
+    };
 
     private final PaintHandler paintHandler;
+    private final GeohashIdentifier geohashIdentifier;
 
     private GeohashLayer() {
         super(Configurer.getINSTANCE().getPluginName());
         paintHandler = new PaintHandler();
-        geohashes = new HashSet<>();
+        geohashIdentifier = new GeohashIdentifier();
     }
 
     public static GeohashLayer getInstance() {
@@ -64,16 +81,18 @@ public final class GeohashLayer extends Layer {
     @Override
     public void paint(final Graphics2D graphics, final MapView mapView, final Bounds bounds) {
         mapView.setDoubleBuffered(true);
-        final BoundingBox mapViewBounds = Convert.convertBoundsToBoundingBox(MainApplication.getMap().mapView
-                .getProjection().getLatLonBoundsBox(MainApplication.getMap().mapView.getProjectionBounds()));
-        geohashes.addAll(GeohashIdentifier.get(mapViewBounds));
-        geohashes = paintHandler.setCodeVisibility(geohashes, graphics, mapView);
+        final Collection<Geohash> geohashes = geohashIdentifier.get(mapViewBounds());
+        paintHandler.setCodeVisibility(geohashes, graphics, mapView);
         setColors();
         for (final Geohash geohash : geohashes) {
-            paintHandler.drawGeohash(graphics, mapView, geohash, false,
-                    geohash.hasVisibleChildren(geohashes));
+            paintHandler.drawGeohash(graphics, mapView, geohash, false);
         }
+    }
 
+    private BoundingBox mapViewBounds() {
+        final ProjectionBounds projectionBounds = MainApplication.getMap().mapView.getProjectionBounds();
+        final Bounds bounds = MainApplication.getMap().mapView.getProjection().getLatLonBoundsBox(projectionBounds);
+        return Convert.convertBoundsToBoundingBox(bounds);
     }
 
     @Override
@@ -88,33 +107,15 @@ public final class GeohashLayer extends Layer {
 
     @Override
     public Action[] getMenuEntries() {
+        increaseCoverageAction.setEnabled(geohashIdentifier.canIncreaseSideRatio()
+                && geohashIdentifier.wouldNoticeSideRatioIncrease(mapViewBounds()));
+        decreaseCoverageAction.setEnabled(geohashIdentifier.canDecreaseSideRatio()
+                && geohashIdentifier.wouldNoticeSideRatioDecrease(mapViewBounds()));
         final LayerListDialog layerListDialog = LayerListDialog.getInstance();
         return new Action[] { layerListDialog.createActivateLayerAction(this),
                 layerListDialog.createShowHideLayerAction(), new GeohashLayerDeleteAction(layerListDialog.getModel()),
-                new ClearAction(),
+                increaseCoverageAction, decreaseCoverageAction,
                 SeparatorLayerAction.INSTANCE, new LayerListPopup.InfoAction(this) };
-    }
-
-    public Set<Geohash> getGeohashes() {
-        return geohashes;
-    }
-
-    public void addGeohash(final Geohash geohash) {
-        geohashes.add(geohash);
-        GeohashLayer.getInstance().invalidate();
-        MainApplication.getMap().repaint();
-    }
-
-    public void addGeohashes(final Collection<Geohash> newGeohashes) {
-        geohashes.addAll(newGeohashes);
-        GeohashLayer.getInstance().invalidate();
-        MainApplication.getMap().repaint();
-    }
-
-    public void removeGeohashes(final Collection<Geohash> removeGeohashes) {
-        geohashes.removeAll(removeGeohashes);
-        GeohashLayer.getInstance().invalidate();
-        MainApplication.getMap().repaint();
     }
 
     @Override
@@ -142,30 +143,5 @@ public final class GeohashLayer extends Layer {
      */
     public void setColors() {
         paintHandler.setColors();
-    }
-
-    /**
-     * Layer menu has a clear geohashes option which is implemented by this class. This option removed all existing
-     * children leaving behind just the world geohash.
-     *
-     * @author laurad
-     * @version $Revision$
-     */
-    private class ClearAction extends AbstractAction{
-
-        private static final long serialVersionUID = -7430280025253271160L;
-
-        private ClearAction() {
-            putValue(NAME, tr("Clear geohashes"));
-        }
-
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            geohashes.clear();
-            final Bounds worldBounds = Main.getProjection().getWorldBoundsLatLon();
-            geohashes = (Set<Geohash>) GeohashIdentifier.get(Convert.convertBoundsToBoundingBox(worldBounds));
-            GeohashLayer.getInstance().invalidate();
-            MainApplication.getMap().repaint();
-        }
     }
 }

@@ -235,15 +235,30 @@ public class BoundingBox {
                 && contains(other.southWest());
     }
 
+    public boolean intersects(final BoundingBox other) {
+        if (other == null) {
+            throw new IllegalArgumentException("received null bounding box");
+        }
+        return (intersectsLatitude(other) && other.intersectsLongitude(this))
+                || (intersectsLongitude(other) && other.intersectsLatitude(this));
+    }
+
+    private boolean intersectsLatitude(final BoundingBox other) {
+        return other.south().between(south, north) || other.north().between(south, north);
+    }
+
+    private boolean intersectsLongitude(final BoundingBox other) {
+        return other.west().between(west, east) || other.east().between(west, east);
+    }
+
+    public boolean sharesAreaWith(final BoundingBox other) {
+        return contains(other) || intersects(other) || other.contains(this);
+    }
+
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 37 * hash + Objects.hashCode(this.north);
-        hash = 37 * hash + Objects.hashCode(this.south);
-        hash = 37 * hash + Objects.hashCode(this.east);
-        hash = 37 * hash + Objects.hashCode(this.west);
-        return hash;
+        return Objects.hash(north, south, east, west);
     }
 
     @Override
@@ -255,16 +270,8 @@ public class BoundingBox {
             return false;
         }
         final BoundingBox other = (BoundingBox) obj;
-        if (!Objects.equals(this.north, other.north)) {
-            return false;
-        }
-        if (!Objects.equals(this.south, other.south)) {
-            return false;
-        }
-        if (!Objects.equals(this.east, other.east)) {
-            return false;
-        }
-        return Objects.equals(this.west, other.west);
+        return Objects.equals(north, other.north) && Objects.equals(south, other.south)
+                && Objects.equals(east, other.east) && Objects.equals(west, other.west);
     }
 
     @Override

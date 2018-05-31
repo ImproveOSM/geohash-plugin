@@ -29,8 +29,7 @@ public class Point {
      */
     public Point(final Longitude longitude, final Latitude latitude) {
         if (longitude == null || latitude == null) {
-            throw new IllegalArgumentException(
-                    "The longitude and latitude must both be not null");
+            throw new IllegalArgumentException("The longitude and latitude must both be not null");
         }
         this.longitude = longitude;
         this.latitude = latitude;
@@ -61,18 +60,12 @@ public class Point {
             return false;
         }
         final Point other = (Point) obj;
-        if (!Objects.equals(this.longitude, other.longitude)) {
-            return false;
-        }
-        return Objects.equals(this.latitude, other.latitude);
+        return Objects.equals(longitude, other.longitude) && Objects.equals(latitude, other.latitude);
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 71 * hash + Objects.hashCode(this.longitude);
-        hash = 71 * hash + Objects.hashCode(this.latitude);
-        return hash;
+        return Objects.hash(longitude, latitude);
     }
 
     @Override

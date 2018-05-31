@@ -11,8 +11,9 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
@@ -60,7 +61,7 @@ public class PaintHandler {
      * @param geohash
      */
     public void drawGeohash(final Graphics2D graphics, final MapView mapView, final Geohash geohash,
-            final boolean isSelected, final boolean hasChildren) {
+            final boolean isSelected) {
         final GeneralPath path = getGeohashPath(geohash, mapView);
         if (isSelected) {
             graphics.setColor(SELECTED_LINE_COLOR);
@@ -69,7 +70,7 @@ public class PaintHandler {
         }
         graphics.setStroke(new BasicStroke(STROKE_WIDTH_2));
         graphics.draw(path);
-        if (geohash.isCodeVisible() && !hasChildren) {
+        if (geohash.isCodeVisible()) {
             final Point textPoint = getTextPoint(geohash, mapView, geohash.code(), graphics);
             PaintManager.drawText(graphics, geohash.code(), textPoint, new Font(FONT_NAME, Font.BOLD, FONT_SIZE),
                     lineColor);
@@ -83,7 +84,7 @@ public class PaintHandler {
      * @param mapView
      * @return geohashPath
      */
-    public GeneralPath getGeohashPath(final Geohash geohash, final MapView mapView) {
+    private GeneralPath getGeohashPath(final Geohash geohash, final MapView mapView) {
         final Latitude north = geohash.bounds().north();
         final Longitude west = geohash.bounds().west();
         final Latitude south = geohash.bounds().south();
@@ -104,7 +105,7 @@ public class PaintHandler {
         return path;
     }
 
-    public Point getTextPoint(final Geohash geohash, final MapView mapView, final String text,
+    private Point getTextPoint(final Geohash geohash, final MapView mapView, final String text,
             final Graphics2D graphics) {
         final double latitude = Convert.fitLatitudeInBounds(geohash.bounds().north().asDegrees());
         final double longitude = geohash.bounds().west().asDegrees();
@@ -144,10 +145,10 @@ public class PaintHandler {
      * @param mapView
      * @return
      */
-    public Set<Geohash> setCodeVisibility(final Set<Geohash> geohashes, final Graphics2D graphics,
+    public void setCodeVisibility(final Collection<Geohash> geohashes, final Graphics2D graphics,
             final MapView mapView) {
         // this is used to force one text width for all geohashes of same code length
-        final int[] codeLengths = new int[GeohashIdentifier.CUTT_OFF_DEPTH + 1];
+        final int[] codeLengths = new int[GeohashIdentifier.CUTOFF_DEPTH + 1];
         for (final Geohash geohash : geohashes) {
             final GeneralPath path = getGeohashPath(geohash, mapView);
             final int geohashLength = geohash.code().length();
@@ -165,6 +166,5 @@ public class PaintHandler {
                 geohash.setCodeVisibility(false);
             }
         }
-        return geohashes;
     }
 }

@@ -5,7 +5,12 @@
  */
 package org.openstreetmap.josm.plugins.geohash.gui;
 
-import net.exfidefortis.map.BoundingBox;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.util.Collection;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.ProjectionBounds;
 import org.openstreetmap.josm.data.osm.visitor.BoundingXYVisitor;
@@ -21,11 +26,7 @@ import org.openstreetmap.josm.plugins.geohash.util.PaintHandler;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.I18n;
 import org.openstreetmap.josm.tools.ImageProvider;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.Collection;
+import net.exfidefortis.map.BoundingBox;
 
 
 /**
@@ -38,7 +39,9 @@ public final class GeohashLayer extends Layer {
     private static GeohashLayer instance;
 
 
-    private AbstractAction increaseCoverageAction = new AbstractAction(I18n.tr("Display larger geohashes")) {
+    private final AbstractAction increaseCoverageAction = new AbstractAction(I18n.tr("Display larger geohashes")) {
+
+        private static final long serialVersionUID = -6243874188335817320L;
 
         @Override
         public void actionPerformed(final ActionEvent e) {
@@ -48,7 +51,9 @@ public final class GeohashLayer extends Layer {
         }
     };
 
-    private AbstractAction decreaseCoverageAction = new AbstractAction(I18n.tr("Display smaller geohashes")) {
+    private final AbstractAction decreaseCoverageAction = new AbstractAction(I18n.tr("Display smaller geohashes")) {
+
+        private static final long serialVersionUID = -8097975275523408384L;
 
         @Override
         public void actionPerformed(final ActionEvent e) {

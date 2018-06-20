@@ -38,7 +38,7 @@ public class GeohashPlugin extends Plugin implements LayerChangeListener {
     private JMenuItem layerMenu;
 
     /**
-     * @param info
+     * @param info - Plugin information
      */
     public GeohashPlugin(final PluginInformation info) {
         super(info);
@@ -70,7 +70,7 @@ public class GeohashPlugin extends Plugin implements LayerChangeListener {
     /**
      * Initializes the the plug-in dialog containing the search geohash option.
      *
-     * @param newMapFrame
+     * @param newMapFrame - the new JOSM frame
      */
     private void initializeDialog(final MapFrame newMapFrame) {
         final GeohashSearchDialog searchDialog = new GeohashSearchDialog();
@@ -99,11 +99,11 @@ public class GeohashPlugin extends Plugin implements LayerChangeListener {
         }
     }
 
-    public void registerListeners() {
+    private void registerListeners() {
         MainApplication.getLayerManager().addLayerChangeListener(this);
     }
 
-    public void unregisterListeners() {
+    private void unregisterListeners() {
         MainApplication.getLayerManager().removeLayerChangeListener(this);
     }
 

@@ -38,7 +38,6 @@ public final class GeohashLayer extends Layer {
 
     private static GeohashLayer instance;
 
-
     private final AbstractAction increaseCoverageAction = new AbstractAction(I18n.tr("Display larger geohashes")) {
 
         private static final long serialVersionUID = -6243874188335817320L;
@@ -87,7 +86,6 @@ public final class GeohashLayer extends Layer {
     public void paint(final Graphics2D graphics, final MapView mapView, final Bounds bounds) {
         mapView.setDoubleBuffered(true);
         final Collection<Geohash> geohashes = geohashIdentifier.get(mapViewBounds());
-        paintHandler.setCodeVisibility(geohashes, graphics, mapView);
         setColors();
         for (final Geohash geohash : geohashes) {
             paintHandler.drawGeohash(graphics, mapView, geohash, false);
@@ -134,14 +132,10 @@ public final class GeohashLayer extends Layer {
     }
 
     @Override
-    public void mergeFrom(final Layer arg0) {
-        // not required
-    }
+    public void mergeFrom(final Layer arg0) {}
 
     @Override
-    public void visitBoundingBox(final BoundingXYVisitor arg0) {
-        // not required
-    }
+    public void visitBoundingBox(final BoundingXYVisitor arg0) {}
 
     /**
      * Method called on layer change to set the line color according to the visible layer background.

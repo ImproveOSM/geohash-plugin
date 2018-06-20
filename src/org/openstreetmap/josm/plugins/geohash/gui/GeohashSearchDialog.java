@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.plugins.geohash.core.Geohash;
@@ -38,15 +39,15 @@ public class GeohashSearchDialog extends ToggleDialog {
 
     private static final long serialVersionUID = -8605852967336765994L;
 
-    /** the preferred dimension of the panel components */
+    /**
+     * the preferred dimension of the panel components
+     */
     private static final Dimension DIM = new Dimension(50, 70);
     private static final Dimension INPUT_DIM = new Dimension(Integer.MAX_VALUE, 20);
     private static final Color WHITE = new Color(255, 255, 255);
     private static final int DLG_HEIGHT = 50;
     private static final Configurer CONFIG = Configurer.getINSTANCE();
-    private final JPanel searchContainer;
     private final JTextField searchInput;
-    private final JButton searchButton;
     private final JTextArea searchOutput;
 
     public GeohashSearchDialog() {
@@ -54,7 +55,7 @@ public class GeohashSearchDialog extends ToggleDialog {
                 Shortcut.registerShortcut(CONFIG.getDialogShortcutName(), CONFIG.getDialogShortcutName(), KeyEvent.VK_0,
                         Shortcut.ALT_SHIFT),
                 DLG_HEIGHT, true, null);
-        searchContainer = new JPanel();
+        final JPanel searchContainer = new JPanel();
         searchContainer.setLayout(new BoxLayout(searchContainer, BoxLayout.PAGE_AXIS));
         searchContainer.setPreferredSize(DIM);
         searchContainer.add(new JLabel(" "));
@@ -73,7 +74,7 @@ public class GeohashSearchDialog extends ToggleDialog {
             }
         });
         searchContainer.add(searchInput);
-        searchButton = ButtonBuilder.build(new SearchAction(), Configurer.getINSTANCE().getDialogButtonName());
+        final JButton searchButton = ButtonBuilder.build(new SearchAction(), Configurer.getINSTANCE().getDialogButtonName());
         searchContainer.add(new JLabel(" "));
         searchContainer.add(searchButton);
 
@@ -97,27 +98,18 @@ public class GeohashSearchDialog extends ToggleDialog {
         @Override
         public void actionPerformed(final ActionEvent e) {
             final String geohashCode = searchInput.getText();
-
-            //            final Optional<Geohash> searchedGeohash =
-            //                    GeohashLayer.getInstance().getGeohashes().stream().filter(g -> g.code().equals(geohashCode))
-            //                    .findFirst();
-            //            if (searchedGeohash.isPresent()) {
-            //                outputSearchFound(searchedGeohash.get());
-            //            } else {
             try {
                 final Geohash findGeohash = new Geohash(geohashCode);
-                //                    GeohashLayer.getInstance().addGeohash(findGeohash);
                 outputSearchFound(findGeohash);
             } catch (final IllegalArgumentException ex) {
                 searchOutput.setText(Configurer.getINSTANCE().getDialogLabelNotFound());
             }
-            //            }
         }
 
         /**
          * Method for displaying the searched geohash on map. Also clears the output message.
          *
-         * @param searchedGeohash
+         * @param searchedGeohash - the geohash to be displayed on map
          */
         private void outputSearchFound(final Geohash searchedGeohash) {
             MainApplication.getMap().mapView.zoomTo(Convert.convertBoundingBoxToBounds(searchedGeohash.bounds()));

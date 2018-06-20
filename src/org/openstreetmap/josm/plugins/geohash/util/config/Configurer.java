@@ -9,35 +9,16 @@ import com.telenav.josm.common.cnf.BaseConfig;
 
 
 /**
- *
- *
+ * Class reading the configuration property file for the Geohash plug-in.
  * @author laurad
  */
 public final class Configurer extends BaseConfig {
 
     private final static String CONFIG_FILE = "geohash.properties";
     private final static Configurer INSTANCE = new Configurer();
-    private final String pluginName;
-    private final String pluginText;
-    private final String layerIcon;
-    private final String layerInfoComponent;
-    private final String layerTooltipText;
-    private final String dialogShortcutIcon;
-    private final String dialogShortcutName;
-    private final String dialogButtonName;
-    private final String dialogLabelNotFound;
 
     private Configurer() {
         super(CONFIG_FILE);
-        pluginName = readProperty("plugin.name");
-        pluginText = readProperty("plugin.txt");
-        layerIcon = readProperty("layer.icon");
-        layerInfoComponent = readProperty("layer.info.component");
-        layerTooltipText = readProperty("layer.tooltip.text");
-        dialogShortcutIcon = readProperty("dialog.shortcut.icon");
-        dialogShortcutName = readProperty("dialog.shortcut.name");
-        dialogButtonName = readProperty("dialog.button.name");
-        dialogLabelNotFound = readProperty("dialog.label.text");
     }
 
 
@@ -45,45 +26,35 @@ public final class Configurer extends BaseConfig {
         return INSTANCE;
     }
 
-
     public String getPluginName() {
-        return pluginName;
+        return readProperty("plugin.name");
     }
-
-
-    public String getPluginText() {
-        return pluginText;
-    }
-
 
     public String getLayerIcon() {
-        return layerIcon;
+        return readProperty("layer.icon");
     }
-
 
     public String getDialogShortcutIcon() {
-        return dialogShortcutIcon;
+        return readProperty("dialog.shortcut.icon");
     }
-
 
     public String getDialogShortcutName() {
-        return dialogShortcutName;
+        return readProperty("dialog.shortcut.name");
     }
 
-
     public String getDialogButtonName() {
-        return dialogButtonName;
+        return readProperty("dialog.button.name");
     }
 
     public String getDialogLabelNotFound() {
-        return dialogLabelNotFound;
+        return readProperty("dialog.label.text");
     }
 
     public String getLayerInfoComponent() {
-        return layerInfoComponent;
+        return readProperty("layer.info.component");
     }
 
     public String getLayerTooltipText() {
-        return layerTooltipText;
+        return readProperty("layer.tooltip.text");
     }
 }

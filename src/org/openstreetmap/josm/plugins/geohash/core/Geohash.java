@@ -8,13 +8,12 @@ package org.openstreetmap.josm.plugins.geohash.core;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+
 import net.exfidefortis.map.BoundingBox;
 import net.exfidefortis.map.Point;
 
 
 /**
- *
- *
  * @author Mihai Chintoanu
  */
 public class Geohash {
@@ -24,7 +23,6 @@ public class Geohash {
 
     private final String code;
     private transient BoundingBox bounds;
-    private boolean codeVisibility;
 
     public Geohash(final String code) {
         if (code == null) {
@@ -42,14 +40,6 @@ public class Geohash {
 
     public String code() {
         return code;
-    }
-
-    public void setCodeVisibility(final boolean codeVisibility) {
-        this.codeVisibility = codeVisibility;
-    }
-
-    public boolean isCodeVisible() {
-        return this.codeVisibility;
     }
 
     public BoundingBox bounds() {

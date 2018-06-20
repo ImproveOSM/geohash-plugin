@@ -11,7 +11,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
-import java.util.Collection;
 import java.util.List;
 
 import org.openstreetmap.josm.data.coor.LatLon;
@@ -20,7 +19,6 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.ImageryLayer;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.geohash.core.Geohash;
-import org.openstreetmap.josm.plugins.geohash.core.GeohashIdentifier;
 import com.telenav.josm.common.gui.PaintManager;
 import net.exfidefortis.map.Latitude;
 import net.exfidefortis.map.Longitude;
@@ -56,12 +54,12 @@ public class PaintHandler {
     /**
      * Method for drawing a geohash on map. This includes the rectangle (geohash area) and the text (geohash code).
      *
-     * @param graphics
-     * @param mapView
-     * @param geohash
+     * @param graphics - the JOSM graphics
+     * @param mapView - the current mapView
+     * @param geohash - the geohash to be drawn
      */
     public void drawGeohash(final Graphics2D graphics, final MapView mapView, final Geohash geohash,
-            final boolean isSelected) {
+                            final boolean isSelected) {
         final GeneralPath path = getGeohashPath(geohash, mapView);
         if (isSelected) {
             graphics.setColor(SELECTED_LINE_COLOR);
@@ -70,19 +68,18 @@ public class PaintHandler {
         }
         graphics.setStroke(new BasicStroke(STROKE_WIDTH_2));
         graphics.draw(path);
-        if (geohash.isCodeVisible()) {
-            final Point textPoint = getTextPoint(geohash, mapView, geohash.code(), graphics);
-            PaintManager.drawText(graphics, geohash.code(), textPoint, new Font(FONT_NAME, Font.BOLD, FONT_SIZE),
-                    lineColor);
-        }
+        final Point textPoint = getTextPoint(geohash, mapView, geohash.code(), graphics);
+        PaintManager.drawText(graphics, geohash.code(), textPoint, new Font(FONT_NAME, Font.BOLD, FONT_SIZE),
+                lineColor);
+
     }
 
     /**
      * Method for calculating geohash rectangle path adapted to map view coordinates.
      *
-     * @param geohash
-     * @param mapView
-     * @return geohashPath
+     * @param geohash - the geohash for which the calculation is made
+     * @param mapView - the current JOSM mapView
+     * @return geohashPath - the path to be drawn
      */
     private GeneralPath getGeohashPath(final Geohash geohash, final MapView mapView) {
         final Latitude north = geohash.bounds().north();
@@ -106,7 +103,7 @@ public class PaintHandler {
     }
 
     private Point getTextPoint(final Geohash geohash, final MapView mapView, final String text,
-            final Graphics2D graphics) {
+                               final Graphics2D graphics) {
         final double latitude = Convert.fitLatitudeInBounds(geohash.bounds().north().asDegrees());
         final double longitude = geohash.bounds().west().asDegrees();
         final LatLon northWest = new LatLon(latitude, longitude);
@@ -132,39 +129,6 @@ public class PaintHandler {
             lineColor = LINE_COLOR_DARK_BACKGROUND;
         } else {
             lineColor = LINE_COLOR_LIGHT_BACKGROUND;
-        }
-    }
-
-    /**
-     * This method sets the codeVisibility attribute for every geohash in the list by checking if the geohash code can
-     * fit in the drawn rectangle. The text width is rounded to the nearest multiple of 10 and is compared to half the
-     * width of the rectangle.
-     *
-     * @param geohashes
-     * @param graphics
-     * @param mapView
-     * @return
-     */
-    public void setCodeVisibility(final Collection<Geohash> geohashes, final Graphics2D graphics,
-            final MapView mapView) {
-        // this is used to force one text width for all geohashes of same code length
-        final int[] codeLengths = new int[GeohashIdentifier.CUTOFF_DEPTH + 1];
-        for (final Geohash geohash : geohashes) {
-            final GeneralPath path = getGeohashPath(geohash, mapView);
-            final int geohashLength = geohash.code().length();
-            int textWidth;
-            if (codeLengths[geohashLength] != 0) {
-                textWidth = codeLengths[geohashLength];
-            } else {
-                textWidth = graphics.getFontMetrics().stringWidth(geohash.code());
-                codeLengths[geohashLength] = textWidth;
-            }
-            final int textHeight = graphics.getFontMetrics().getHeight();
-            if ((textWidth < (path.getBounds().getWidth() / 2)) && (textHeight < path.getBounds().height)) {
-                geohash.setCodeVisibility(true);
-            } else {
-                geohash.setCodeVisibility(false);
-            }
         }
     }
 }

@@ -5,7 +5,8 @@
  */
 package org.openstreetmap.josm.plugins.geohash.util;
 
-import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.spi.preferences.Config;
+
 
 /**
  *
@@ -24,11 +25,11 @@ public final class PreferenceManager {
     }
 
     public boolean loadLayerOpenedFlag() {
-        final String layerOpened = Main.pref.get(LAYER_OPENED);
+        final String layerOpened = Config.getPref().get(LAYER_OPENED);
         return layerOpened.isEmpty() ? false : Boolean.valueOf(layerOpened);
     }
 
     public void setLayerOpenedFlag(final Boolean isOpened) {
-        Main.pref.put(LAYER_OPENED, isOpened.toString());
+        Config.getPref().put(LAYER_OPENED, isOpened.toString());
     }
 }

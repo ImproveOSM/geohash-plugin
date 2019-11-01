@@ -23,8 +23,6 @@ Geohash JOSM plug-in documentation.
 
 ### External links ###
 
-* Spaces Documentation: http://spaces.telenav.com:8080/display/TNOSM/GEOHASH+Plug-in+++-+++Product+Documentation
-* GitHub: https://github.com/Telenav/geohash-plugin
+* GitHub: https://github.com/ImproveOSM/geohash-plugin
 * Blog: http://blog.improve-osm.org/en/2018/03/geohash-josm-plug-in/
 * JOSM Wiki: https://wiki.openstreetmap.org/wiki/JOSM/Plugins/GeoHash
-

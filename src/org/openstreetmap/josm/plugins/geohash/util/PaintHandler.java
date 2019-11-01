@@ -1,7 +1,8 @@
 /*
- * The code is licensed under the GPL Version 3 license https://www.gnu.org/licenses/quick-guide-gplv3.html.
+ * Copyright 2019 Grabtaxi Holdings PTE LTE (GRAB), All rights reserved.
  *
- * Copyright (c)2017, Telenav, Inc. All Rights Reserved
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
+ *
  */
 package org.openstreetmap.josm.plugins.geohash.util;
 
@@ -12,7 +13,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.util.List;
-
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MapView;
@@ -59,7 +59,7 @@ public class PaintHandler {
      * @param geohash - the geohash to be drawn
      */
     public void drawGeohash(final Graphics2D graphics, final MapView mapView, final Geohash geohash,
-                            final boolean isSelected) {
+            final boolean isSelected) {
         final GeneralPath path = getGeohashPath(geohash, mapView);
         if (isSelected) {
             graphics.setColor(SELECTED_LINE_COLOR);
@@ -103,7 +103,7 @@ public class PaintHandler {
     }
 
     private Point getTextPoint(final Geohash geohash, final MapView mapView, final String text,
-                               final Graphics2D graphics) {
+            final Graphics2D graphics) {
         final double latitude = Convert.fitLatitudeInBounds(geohash.bounds().north().asDegrees());
         final double longitude = geohash.bounds().west().asDegrees();
         final LatLon northWest = new LatLon(latitude, longitude);

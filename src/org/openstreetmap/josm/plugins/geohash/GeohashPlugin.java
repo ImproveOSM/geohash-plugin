@@ -1,10 +1,14 @@
 /*
- * The code is licensed under the GPL Version 3 license https://www.gnu.org/licenses/quick-guide-gplv3.html.
+ * Copyright 2019 Grabtaxi Holdings PTE LTE (GRAB), All rights reserved.
  *
- * Copyright (c)2017, Telenav, Inc. All Rights Reserved
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
+ *
  */
 package org.openstreetmap.josm.plugins.geohash;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionEvent;
+import javax.swing.JMenuItem;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.gui.MainApplication;
 import org.openstreetmap.josm.gui.MainMenu;
@@ -21,10 +25,6 @@ import org.openstreetmap.josm.plugins.geohash.gui.GeohashSearchDialog;
 import org.openstreetmap.josm.plugins.geohash.util.PreferenceManager;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.ImageProvider;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 
 
 /**

@@ -1,11 +1,17 @@
+/*
+ * Copyright 2019 Grabtaxi Holdings PTE LTE (GRAB), All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
+ *
+ */
 package org.openstreetmap.josm.plugins.geohash.core;
 
+import org.junit.Assert;
+import org.junit.Test;
 import net.exfidefortis.map.BoundingBox;
 import net.exfidefortis.map.Latitude;
 import net.exfidefortis.map.Longitude;
 import net.exfidefortis.map.Point;
-import org.junit.Assert;
-import org.junit.Test;
 
 
 /**

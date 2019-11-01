@@ -1,14 +1,14 @@
 /*
- * The code is licensed under the GPL Version 3 license https://www.gnu.org/licenses/quick-guide-gplv3.html.
+ * Copyright 2019 Grabtaxi Holdings PTE LTE (GRAB), All rights reserved.
  *
- * Copyright (c)2017, Telenav, Inc. All Rights Reserved
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file.
+ *
  */
 package org.openstreetmap.josm.plugins.geohash.core;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-
 import net.exfidefortis.map.BoundingBox;
 import net.exfidefortis.map.Point;
 

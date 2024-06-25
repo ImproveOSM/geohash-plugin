@@ -19,7 +19,7 @@ import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.layer.ImageryLayer;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.plugins.geohash.core.Geohash;
-import com.telenav.josm.common.gui.PaintManager;
+import com.grab.josm.common.gui.PaintManager;
 import net.exfidefortis.map.Latitude;
 import net.exfidefortis.map.Longitude;
 

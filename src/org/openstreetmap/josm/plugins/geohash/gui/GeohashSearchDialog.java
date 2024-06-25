@@ -24,8 +24,8 @@ import org.openstreetmap.josm.plugins.geohash.core.Geohash;
 import org.openstreetmap.josm.plugins.geohash.util.Convert;
 import org.openstreetmap.josm.plugins.geohash.util.config.Configurer;
 import org.openstreetmap.josm.tools.Shortcut;
-import com.telenav.josm.common.gui.builder.ButtonBuilder;
-import com.telenav.josm.common.gui.builder.TextComponentBuilder;
+import com.grab.josm.common.gui.builder.ButtonBuilder;
+import com.grab.josm.common.gui.builder.TextComponentBuilder;
 
 
 /**

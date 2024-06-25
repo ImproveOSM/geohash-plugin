@@ -62,6 +62,10 @@ public final class GeohashIdentifier {
     private static final Percent SIDE_RATIO_STEP = new Percent(30);
     private static final Percent SIDE_RATIO_LEEWAY = new Percent(10);
 
+    private boolean isZoomFrozen = false;
+
+    private Collection<Geohash> geohashesBeforeFreeze;
+
 
     /** The ratio between the geohash side length and the area side length which must not be exceeded */
     private Percent sideRatio = DEFAULT_SIDE_RATIO;
@@ -122,6 +126,22 @@ public final class GeohashIdentifier {
         if (canDecreaseSideRatio()) {
             sideRatio = sideRatio.subtract(SIDE_RATIO_STEP);
         }
+    }
+
+    /**
+     * Freezes or unfreezes geohash calculation on zoom
+     */
+    public void setZoomFreeze(boolean freeze, BoundingBox bounds) {
+        isZoomFrozen = freeze;
+        geohashesBeforeFreeze = get(bounds);
+    }
+
+    public boolean getZoomFreeze() {
+        return isZoomFrozen;
+    }
+
+    public Collection<Geohash> getGeohashesBeforeFreeze() {
+        return geohashesBeforeFreeze;
     }
 
     /**

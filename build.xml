@@ -31,7 +31,7 @@
 			<fileset dir="${plugin.lib.dir}" includes="**/*.jar" excludes="josm-tested.jar,hamcrest-core-1.3.jar,junit-4.12.jar,gson-2.5.jar" />
 			<fileset dir="${plugin.lib.dir}" includes="${JOSM_lib}" />
 		</path>
-		<javac srcdir="src" debug="true" destdir="${plugin.build.dir}" includeantruntime="true" excludes="**/package-info.java" classpathref="classpath">
+		<javac srcdir="src" source="11" target="11" debug="true" destdir="${plugin.build.dir}" includeantruntime="true" excludes="**/package-info.java" classpathref="classpath">
 			<compilerarg value="-Xlint:deprecation" />
 			<compilerarg value="-Xlint:unchecked" />
 		</javac>
@@ -64,7 +64,7 @@
 			</fileset>
 		</copy>
 		<jar destfile="${plugin.out.dir}/${plugin.name}" basedir="${plugin.build.dir}">
-			<zipfileset src="${plugin.lib.dir}/josm-common-3.4.10.jar" />
+			<zipfileset src="${plugin.lib.dir}/josm-common-3.9.jar" />
 			<manifest>
 				<attribute name="Author" value="Grab" />
 				<attribute name="Plugin-Class" value="org.openstreetmap.josm.plugins.geohash.GeohashPlugin" />
@@ -73,7 +73,7 @@
 				<attribute name="Plugin-Icon" value="images/geohash_logo.png" />
 				<attribute name="Plugin-Version" value="${build-label}" />
 				<attribute name="Plugin-Early" value="true" />
-				<attribute name="Plugin-Mainversion" value="10161" />
+				<attribute name="Plugin-Mainversion" value="16731" />
 				<attribute name="Plugin-Canloadatruntime" value="true"/>
 				<attribute name="Plugin-Link" value="https://wiki.openstreetmap.org/wiki/JOSM/Plugins/GeoHash" />
 			</manifest>

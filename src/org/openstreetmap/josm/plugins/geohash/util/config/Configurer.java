@@ -6,11 +6,12 @@
  */
 package org.openstreetmap.josm.plugins.geohash.util.config;
 
-import com.telenav.josm.common.cnf.BaseConfig;
+import com.grab.josm.common.cnf.BaseConfig;
 
 
 /**
  * Class reading the configuration property file for the Geohash plug-in.
+ *
  * @author laurad
  */
 public final class Configurer extends BaseConfig {
@@ -58,4 +59,22 @@ public final class Configurer extends BaseConfig {
     public String getLayerTooltipText() {
         return readProperty("layer.tooltip.text");
     }
+
+    public String getEnableZoomFreezeText() {
+        return readProperty("menu.zoomfreeze.enable.text");
+    }
+
+    public String getDisableZoomFreezeText() {
+        return readProperty("menu.zoomfreeze.disable.text");
+    }
+
+    public String getDisplayLargerGeohashesText() {
+        return readProperty("menu.display.larger.geohashes.text");
+    }
+
+    public String getDisplaySmallerGeohashesText() {
+        return readProperty("menu.display.smaller.geohashes.text");
+    }
+
+
 }
